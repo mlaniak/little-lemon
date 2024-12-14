@@ -33,7 +33,7 @@ const theme = createTheme({
 function App() {
   return (
     <ThemeProvider theme={theme}>
-      <Router>
+      <Router basename="/little-lemon">
         <div className="App">
           <Navbar />
           <main>
