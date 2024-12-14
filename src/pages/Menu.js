@@ -64,26 +64,72 @@ const Menu = () => {
   const menuCategories = ['starters', 'mains', 'desserts'];
 
   return (
-    <Container maxWidth="lg" sx={{ py: 8 }}>
-      <Typography variant="h2" align="center" gutterBottom>
+    <Container 
+      maxWidth="lg" 
+      sx={{ 
+        py: { xs: 4, md: 8 },
+        px: { xs: 2, md: 3 }
+      }}
+    >
+      <Typography 
+        variant="h2" 
+        align="center" 
+        gutterBottom
+        sx={{
+          fontSize: { xs: '2rem', md: '2.5rem' },
+          mb: { xs: 3, md: 4 }
+        }}
+      >
         Our Menu
       </Typography>
       
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 4 }}>
+      <Box 
+        sx={{ 
+          borderBottom: 1, 
+          borderColor: 'divider', 
+          mb: { xs: 3, md: 4 },
+          mx: { xs: -2, md: 0 } // Compensate for container padding on mobile
+        }}
+      >
         <Tabs
           value={value}
           onChange={handleChange}
           centered
           textColor="primary"
           indicatorColor="primary"
+          variant="scrollable"
+          scrollButtons="auto"
+          allowScrollButtonsMobile
+          sx={{
+            '& .MuiTab-root': {
+              fontSize: { xs: '0.875rem', md: '1rem' },
+              minWidth: { xs: 'auto', md: 160 },
+              px: { xs: 2, md: 3 },
+            }
+          }}
         >
           {categories.map((category, index) => (
-            <Tab label={category} key={index} />
+            <Tab 
+              label={category} 
+              key={index}
+              sx={{
+                '&.Mui-selected': {
+                  color: 'primary.main',
+                  fontWeight: 'bold'
+                }
+              }}
+            />
           ))}
         </Tabs>
       </Box>
 
-      <Grid container spacing={4}>
+      <Grid 
+        container 
+        spacing={{ xs: 2, md: 4 }}
+        sx={{
+          mt: { xs: 1, md: 2 }
+        }}
+      >
         {menuItems[menuCategories[value]].map((item) => (
           <Grid item xs={12} sm={6} md={4} key={item.id}>
             <MenuItem {...item} />

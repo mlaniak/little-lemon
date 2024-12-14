@@ -8,6 +8,7 @@
 
 main {
   flex: 1;
+  padding-bottom: 2rem;
 }
 
 /* Remove default styles */
@@ -32,4 +33,32 @@ a {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #374842;
+}
+
+/* Responsive images */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Responsive container padding */
+@media (max-width: 600px) {
+  .MuiContainer-root {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}
+
+/* Button responsiveness */
+@media (max-width: 600px) {
+  .button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .button-container .MuiButton-root {
+    width: 100%;
+    margin: 0;
+  }
 }
