@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -33,7 +33,7 @@ const theme = createTheme({
 function App() {
   return (
     <ThemeProvider theme={theme}>
-      <Router basename="/little-lemon">
+      <Router>
         <div className="App">
           <Navbar />
           <main>
