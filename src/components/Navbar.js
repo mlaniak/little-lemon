@@ -11,11 +11,16 @@ import {
   List,
   ListItem,
   ListItemText,
+  useScrollTrigger,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const trigger = useScrollTrigger({
+    disableHysteresis: true,
+    threshold: 0,
+  });
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -47,7 +52,17 @@ const Navbar = () => {
 
   return (
     <>
-      <AppBar position="static" color="primary">
+      <AppBar 
+        position="sticky" 
+        color="primary"
+        elevation={trigger ? 4 : 0}
+        sx={{
+          top: 0,
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          transition: 'box-shadow 0.3s ease-in-out',
+          backgroundColor: trigger ? 'primary.main' : 'primary.main',
+        }}
+      >
         <Toolbar>
           <IconButton
             color="inherit"
@@ -86,6 +101,7 @@ const Navbar = () => {
           </Box>
         </Toolbar>
       </AppBar>
+      <Toolbar /> {/* Add spacer to prevent content from jumping */}
       <Box component="nav">
         <Drawer
           variant="temporary"
