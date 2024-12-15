@@ -248,18 +248,20 @@ const Reservations = () => {
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <FormControl fullWidth required>
-                <InputLabel>Number of Guests</InputLabel>
+              <FormControl fullWidth sx={{ mb: 2 }}>
+                <InputLabel id="guests-label">Number of Guests</InputLabel>
                 <Select
+                  labelId="guests-label"
+                  id="guests"
                   name="guests"
                   value={formData.guests}
                   label="Number of Guests"
                   onChange={handleChange}
-                  disabled={loading}
+                  required
                 >
-                  {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
-                    <MenuItem key={num} value={num}>
-                      {num} {num === 1 ? 'Guest' : 'Guests'}
+                  {[...Array(20)].map((_, i) => (
+                    <MenuItem key={i + 1} value={i + 1}>
+                      {i + 1} {i === 0 ? 'Guest' : 'Guests'}
                     </MenuItem>
                   ))}
                 </Select>
