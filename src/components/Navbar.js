@@ -51,13 +51,15 @@ const Navbar = () => {
   );
 
   return (
-    <>
+    <Box sx={{ mb: 2 }}>
       <AppBar 
-        position="sticky" 
+        position="fixed" 
         color="primary"
         elevation={trigger ? 4 : 0}
         sx={{
           top: 0,
+          left: 0,
+          right: 0,
           zIndex: (theme) => theme.zIndex.drawer + 1,
           transition: 'box-shadow 0.3s ease-in-out',
           backgroundColor: trigger ? 'primary.main' : 'primary.main',
@@ -119,7 +121,7 @@ const Navbar = () => {
           {drawer}
         </Drawer>
       </Box>
-    </>
+    </Box>
   );
 };
 
