@@ -5,76 +5,77 @@ const MenuItem = ({ title, description, price, image }) => {
   return (
     <Card 
       sx={{ 
-        height: '100%', 
-        display: 'flex', 
+        width: '100%',
+        height: 460,
+        display: 'flex',
         flexDirection: 'column',
-        borderRadius: { xs: 2, md: 3 },
-        boxShadow: { 
-          xs: '0 2px 4px rgba(0,0,0,0.1)', 
-          md: '0 4px 8px rgba(0,0,0,0.1)' 
-        },
+        borderRadius: 2,
+        bgcolor: 'background.paper',
+        overflow: 'hidden',
+        transition: '0.3s',
         '&:hover': {
           transform: 'translateY(-4px)',
-          transition: 'transform 0.3s ease-in-out',
-          boxShadow: '0 6px 12px rgba(0,0,0,0.15)'
-        }
+          boxShadow: 4,
+        },
       }}
     >
-      <CardMedia
-        component="img"
-        height={{ xs: '160', sm: '180', md: '200' }}
-        image={image}
-        alt={title}
-        sx={{ 
-          objectFit: 'cover',
-          borderTopLeftRadius: { xs: 8, md: 12 },
-          borderTopRightRadius: { xs: 8, md: 12 }
-        }}
-      />
-      <CardContent 
-        sx={{ 
-          flexGrow: 1,
-          p: { xs: 2, md: 3 }
-        }}
-      >
-        <Box 
+      <Box sx={{ 
+        position: 'relative',
+        width: '100%',
+        height: 260,
+        overflow: 'hidden'
+      }}>
+        <CardMedia
+          component="img"
+          image={image}
+          alt={title}
           sx={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center',
-            mb: { xs: 1, md: 2 }
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center',
           }}
-        >
+        />
+      </Box>
+      <CardContent sx={{ 
+        p: 3,
+        flexGrow: 1,
+        display: 'flex', 
+        flexDirection: 'column',
+      }}>
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          mb: 2 
+        }}>
           <Typography 
             variant="h6" 
-            component="h3"
-            sx={{
-              fontSize: { xs: '1.1rem', md: '1.25rem' },
-              fontWeight: 'bold',
-              color: 'primary.main'
+            component="div"
+            sx={{ 
+              fontWeight: 500,
+              color: 'text.primary'
             }}
           >
             {title}
           </Typography>
           <Typography 
             variant="h6" 
-            color="primary" 
+            component="div"
             sx={{ 
-              fontWeight: 'bold',
-              fontSize: { xs: '1.1rem', md: '1.25rem' },
-              color: 'secondary.main'
+              color: 'primary.main',
+              fontWeight: 500
             }}
           >
             ${price}
           </Typography>
         </Box>
         <Typography 
-          variant="body2" 
+          variant="body1" 
           color="text.secondary"
-          sx={{
-            fontSize: { xs: '0.875rem', md: '1rem' },
+          sx={{ 
+            flexGrow: 1,
             lineHeight: 1.6,
-            mt: { xs: 1, md: 1.5 }
           }}
         >
           {description}

@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { LocalizationProvider, DatePicker, TimePicker } from '@mui/x-date-pickers';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 
 const Reservations = () => {
   const [formData, setFormData] = useState({
@@ -25,7 +25,8 @@ const Reservations = () => {
     email: '',
     phone: '',
     date: null,
-    time: null,
+    hour: '',
+    minute: '',
     guests: '',
     occasion: '',
     specialRequests: '',
@@ -58,13 +59,6 @@ const Reservations = () => {
     }));
   };
 
-  const handleTimeChange = (time) => {
-    setFormData((prev) => ({
-      ...prev,
-      time: time,
-    }));
-  };
-
   const handleCloseSnackbar = () => {
     setSnackbar((prev) => ({ ...prev, open: false }));
   };
@@ -73,7 +67,7 @@ const Reservations = () => {
     e.preventDefault();
     
     // Basic validation
-    if (!formData.name || !formData.email || !formData.date || !formData.time || !formData.guests) {
+    if (!formData.name || !formData.email || !formData.date || !formData.hour || !formData.minute || !formData.guests) {
       setError('Please fill in all required fields');
       return;
     }
@@ -101,6 +95,24 @@ const Reservations = () => {
       setLoading(false);
     }
   };
+
+  // Generate hours from 11 AM to 10 PM
+  const hours = Array.from({ length: 12 }, (_, i) => {
+    const hour = i + 11;
+    return {
+      value: hour.toString().padStart(2, '0'),
+      label: `${hour > 12 ? hour - 12 : hour}${hour >= 12 ? ' PM' : ' AM'}`
+    };
+  });
+
+  // Generate minutes in 15-minute intervals
+  const minutes = Array.from({ length: 4 }, (_, i) => {
+    const minute = i * 15;
+    return {
+      value: minute.toString().padStart(2, '0'),
+      label: `:${minute.toString().padStart(2, '0')}`
+    };
+  });
 
   if (submitted) {
     return (
@@ -150,7 +162,8 @@ const Reservations = () => {
                 email: '',
                 phone: '',
                 date: null,
-                time: null,
+                hour: '',
+                minute: '',
                 guests: '',
                 occasion: '',
                 specialRequests: '',
@@ -171,19 +184,21 @@ const Reservations = () => {
 
   return (
     <Container 
-      maxWidth="lg" 
+      maxWidth={false}
       sx={{ 
-        py: { xs: 4, md: 8 },
-        px: { xs: 2, md: 3 }
+        maxWidth: 'lg',
+        width: '100%',
+        px: { xs: 2, sm: 3, md: 6 },
+        py: { xs: 4, md: 6 }
       }}
     >
       <Typography 
         variant="h2" 
-        align="center" 
-        gutterBottom
         sx={{
-          fontSize: { xs: '2rem', md: '2.5rem' },
-          mb: { xs: 3, md: 4 },
+          fontFamily: "'Markazi Text', serif",
+          fontSize: { xs: '2.5rem', md: '3rem' },
+          mb: 4,
+          textAlign: 'center',
           color: 'primary.main'
         }}
       >
@@ -191,50 +206,44 @@ const Reservations = () => {
       </Typography>
 
       <Paper 
-        elevation={3} 
+        elevation={0}
         sx={{ 
-          p: { xs: 3, md: 4 }, 
-          mt: { xs: 2, md: 4 },
-          borderRadius: { xs: 2, md: 3 }
+          p: { xs: 2, sm: 3, md: 4 },
+          borderRadius: 2,
+          bgcolor: 'background.paper',
+          maxWidth: 800,
+          mx: 'auto'
         }}
       >
         {error && (
-          <Alert 
-            severity="error" 
-            sx={{ 
-              mb: 4,
-              '& .MuiAlert-message': {
-                fontSize: { xs: '0.875rem', md: '1rem' }
-              }
-            }}
-          >
+          <Alert severity="error" sx={{ mb: 3 }}>
             {error}
           </Alert>
         )}
 
         <form onSubmit={handleSubmit}>
-          <Grid container spacing={{ xs: 2, md: 4 }}>
+          <Grid container spacing={3}>
             <Grid item xs={12} sm={6}>
               <TextField
-                required
                 fullWidth
                 label="Name"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                disabled={loading}
+                required
+                variant="outlined"
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                required
                 fullWidth
                 label="Email"
                 name="email"
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
-                disabled={loading}
+                required
+                variant="outlined"
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -244,11 +253,11 @@ const Reservations = () => {
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                disabled={loading}
+                variant="outlined"
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <FormControl fullWidth sx={{ mb: 2 }}>
+              <FormControl fullWidth>
                 <InputLabel id="guests-label">Number of Guests</InputLabel>
                 <Select
                   labelId="guests-label"
@@ -274,27 +283,49 @@ const Reservations = () => {
                   value={formData.date}
                   onChange={handleDateChange}
                   renderInput={(params) => (
-                    <TextField {...params} fullWidth required />
+                    <TextField {...params} fullWidth required variant="outlined" />
                   )}
-                  disabled={loading}
                   minDate={new Date()}
                 />
               </LocalizationProvider>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <TimePicker
-                  label="Time"
-                  value={formData.time}
-                  onChange={handleTimeChange}
-                  renderInput={(params) => (
-                    <TextField {...params} fullWidth required />
-                  )}
-                  disabled={loading}
-                  minTime={new Date(0, 0, 0, 11)}
-                  maxTime={new Date(0, 0, 0, 22)}
-                />
-              </LocalizationProvider>
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
+                  <FormControl fullWidth required>
+                    <InputLabel>Hour</InputLabel>
+                    <Select
+                      name="hour"
+                      value={formData.hour}
+                      label="Hour"
+                      onChange={handleChange}
+                    >
+                      {hours.map(({ value, label }) => (
+                        <MenuItem key={value} value={value}>
+                          {label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={6}>
+                  <FormControl fullWidth required>
+                    <InputLabel>Minute</InputLabel>
+                    <Select
+                      name="minute"
+                      value={formData.minute}
+                      label="Minute"
+                      onChange={handleChange}
+                    >
+                      {minutes.map(({ value, label }) => (
+                        <MenuItem key={value} value={value}>
+                          {label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </Grid>
             </Grid>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
@@ -304,7 +335,6 @@ const Reservations = () => {
                   value={formData.occasion}
                   label="Occasion (Optional)"
                   onChange={handleChange}
-                  disabled={loading}
                 >
                   <MenuItem value="birthday">Birthday</MenuItem>
                   <MenuItem value="anniversary">Anniversary</MenuItem>
@@ -323,7 +353,7 @@ const Reservations = () => {
                 onChange={handleChange}
                 multiline
                 rows={4}
-                disabled={loading}
+                variant="outlined"
               />
             </Grid>
             <Grid item xs={12}>

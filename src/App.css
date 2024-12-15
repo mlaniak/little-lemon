@@ -9,7 +9,6 @@
 main {
   flex: 1;
   padding-bottom: 2rem;
-  margin-top: 64px; /* Add margin to account for fixed navbar */
 }
 
 /* Remove default styles */

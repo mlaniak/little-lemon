@@ -32,33 +32,35 @@ const galleryImages = [
 const About = () => {
   return (
     <Container 
-      maxWidth="lg" 
+      maxWidth={false}
       sx={{ 
-        py: { xs: 4, md: 8 },
-        px: { xs: 2, md: 3 }
+        maxWidth: 'lg',
+        width: '100%',
+        px: { xs: 2, sm: 3, md: 6 },
+        py: { xs: 4, md: 6 }
       }}
     >
       <Typography 
         variant="h2" 
-        align="center" 
-        gutterBottom
         sx={{
-          fontSize: { xs: '2rem', md: '2.5rem' },
-          mb: { xs: 3, md: 4 },
+          fontFamily: "'Markazi Text', serif",
+          fontSize: { xs: '2.5rem', md: '3rem' },
+          mb: 4,
+          textAlign: 'center',
           color: 'primary.main'
         }}
       >
-        About Little Lemon
+        About Us
       </Typography>
 
-      <Grid container spacing={{ xs: 3, md: 4 }}>
+      <Grid container spacing={4}>
         <Grid item xs={12} md={6}>
-          <Box sx={{ mb: { xs: 3, md: 4 } }}>
+          <Box sx={{ mb: 4 }}>
             <Typography 
               variant="h5" 
-              gutterBottom
               sx={{
-                fontSize: { xs: '1.25rem', md: '1.5rem' },
+                fontFamily: "'Markazi Text', serif",
+                fontSize: { xs: '1.5rem', md: '1.75rem' },
                 mb: 2,
                 color: 'primary.main'
               }}
@@ -67,11 +69,10 @@ const About = () => {
             </Typography>
             <Typography 
               variant="body1" 
-              paragraph
               sx={{
                 fontSize: { xs: '1rem', md: '1.1rem' },
                 lineHeight: 1.8,
-                mb: { xs: 2, md: 3 }
+                mb: 3
               }}
             >
               Little Lemon is a charming Mediterranean restaurant that brings the flavors of the 
@@ -81,7 +82,6 @@ const About = () => {
             </Typography>
             <Typography 
               variant="body1" 
-              paragraph
               sx={{
                 fontSize: { xs: '1rem', md: '1.1rem' },
                 lineHeight: 1.8
@@ -97,9 +97,9 @@ const About = () => {
           <Box>
             <Typography 
               variant="h5" 
-              gutterBottom
               sx={{
-                fontSize: { xs: '1.25rem', md: '1.5rem' },
+                fontFamily: "'Markazi Text', serif",
+                fontSize: { xs: '1.5rem', md: '1.75rem' },
                 mb: 2,
                 color: 'primary.main'
               }}

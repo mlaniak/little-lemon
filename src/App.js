@@ -7,7 +7,8 @@ import Home from './pages/Home';
 import Menu from './pages/Menu';
 import Reservations from './pages/Reservations';
 import About from './pages/About';
-import Contact from './pages/Contact';
+import Order from './pages/Order';
+import Login from './pages/Login';
 import './App.css';
 
 const theme = createTheme({
@@ -39,10 +40,11 @@ function App() {
           <main>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
               <Route path="/menu" element={<Menu />} />
               <Route path="/reservations" element={<Reservations />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
+              <Route path="/order" element={<Order />} />
+              <Route path="/login" element={<Login />} />
             </Routes>
           </main>
           <Footer />
