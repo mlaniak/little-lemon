@@ -11,7 +11,6 @@ import {
   Select,
   MenuItem,
   Alert,
-  Box,
   CircularProgress,
   useMediaQuery,
   Snackbar,
@@ -19,7 +18,6 @@ import {
 import { useTheme } from '@mui/material/styles';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DatePicker, TimePicker } from '@mui/x-date-pickers';
-import Loading from '../components/Loading';
 
 const Reservations = () => {
   const [formData, setFormData] = useState({

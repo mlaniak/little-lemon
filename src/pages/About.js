@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Typography, Grid, Box, Skeleton } from '@mui/material';
+import { Container, Typography, Grid, Box } from '@mui/material';
 import ImageGallery from '../components/ImageGallery';
 
 const galleryImages = [
