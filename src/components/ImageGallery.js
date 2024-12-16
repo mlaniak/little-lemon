@@ -6,7 +6,6 @@ import {
   Modal,
   useMediaQuery,
   IconButton,
-  Skeleton,
   Typography,
   LinearProgress,
 } from '@mui/material';
@@ -15,12 +14,10 @@ import CloseIcon from '@mui/icons-material/Close';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import useSwipe from '../hooks/useSwipe';
-import TouchFeedback from './TouchFeedback';
 
 const ImageGallery = ({ images }) => {
   const [open, setOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -77,7 +74,6 @@ const ImageGallery = ({ images }) => {
 
       if (currentStep >= steps) {
         clearInterval(timer);
-        setLoading(false);
       }
     }, interval);
   };

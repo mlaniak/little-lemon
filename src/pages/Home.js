@@ -1,10 +1,8 @@
 import React from 'react';
 import { Container, Typography, Button, Box, Grid, Card, CardContent, CardMedia, Rating, Avatar } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
-import { useTheme } from '@mui/material/styles';
 
 const Home = () => {
-  const theme = useTheme();
   const specials = [
     {
       title: "Greek salad",

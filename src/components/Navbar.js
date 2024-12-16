@@ -4,26 +4,20 @@ import {
   AppBar,
   Toolbar,
   IconButton,
-  Typography,
   Button,
   Box,
   Drawer,
   List,
   ListItem,
   ListItemText,
-  useScrollTrigger,
-  Divider,
-  Container
+  Container,
+  Divider
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import LoginIcon from '@mui/icons-material/Login';
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const trigger = useScrollTrigger({
-    disableHysteresis: true,
-    threshold: 0,
-  });
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
