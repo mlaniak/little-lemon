@@ -4,42 +4,34 @@ import ImageGallery from '../components/ImageGallery';
 
 const galleryImages = [
   {
-    url: '/images/restaurant.jpg',
+    url: 'https://images.unsplash.com/photo-1587574293340-e0011c4e8ecf?auto=format&fit=crop&w=800',
     title: 'Restaurant Interior',
   },
   {
-    url: '/images/chef.jpg',
+    url: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=800',
     title: 'Our Chef',
   },
   {
-    url: '/images/cooking.jpg',
+    url: 'https://images.unsplash.com/photo-1507048331197-7d4ac70811cf?auto=format&fit=crop&w=800',
     title: 'Cooking in Action',
   },
   {
-    url: '/images/ingredients.jpg',
+    url: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800',
     title: 'Fresh Ingredients',
   },
   {
-    url: '/images/dish.jpg',
+    url: 'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=800',
     title: 'Signature Dish',
   },
   {
-    url: '/images/team.jpg',
+    url: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=800',
     title: 'Our Team',
   },
 ];
 
 const About = () => {
   return (
-    <Container 
-      maxWidth={false}
-      sx={{ 
-        maxWidth: 'lg',
-        width: '100%',
-        px: { xs: 2, sm: 3, md: 6 },
-        py: { xs: 4, md: 6 }
-      }}
-    >
+    <Container maxWidth="lg">
       <Typography 
         variant="h2" 
         sx={{
@@ -53,72 +45,44 @@ const About = () => {
         About Us
       </Typography>
 
-      <Grid container spacing={4}>
+      <Grid container spacing={4} alignItems="center">
         <Grid item xs={12} md={6}>
-          <Box sx={{ mb: 4 }}>
-            <Typography 
-              variant="h5" 
-              sx={{
-                fontFamily: "'Markazi Text', serif",
-                fontSize: { xs: '1.5rem', md: '1.75rem' },
-                mb: 2,
-                color: 'primary.main'
-              }}
-            >
-              Our Story
-            </Typography>
-            <Typography 
-              variant="body1" 
-              sx={{
-                fontSize: { xs: '1rem', md: '1.1rem' },
-                lineHeight: 1.8,
-                mb: 3
-              }}
-            >
-              Little Lemon is a charming Mediterranean restaurant that brings the flavors of the 
-              Mediterranean coast to Chicago. Our story began with a passion for authentic cuisine 
-              and a dream to create a warm, welcoming space where people can gather to enjoy 
-              delicious food and create lasting memories.
-            </Typography>
-            <Typography 
-              variant="body1" 
-              sx={{
-                fontSize: { xs: '1rem', md: '1.1rem' },
-                lineHeight: 1.8
-              }}
-            >
-              Founded by the Antonopoulos family, our restaurant combines traditional recipes 
-              passed down through generations with modern culinary techniques. Every dish we 
-              serve is crafted with love, using the freshest ingredients sourced from local 
-              markets and trusted Mediterranean suppliers.
-            </Typography>
-          </Box>
-
-          <Box>
-            <Typography 
-              variant="h5" 
-              sx={{
-                fontFamily: "'Markazi Text', serif",
-                fontSize: { xs: '1.5rem', md: '1.75rem' },
-                mb: 2,
-                color: 'primary.main'
-              }}
-            >
-              Our Philosophy
-            </Typography>
-            <Typography 
-              variant="body1"
-              sx={{
-                fontSize: { xs: '1rem', md: '1.1rem' },
-                lineHeight: 1.8
-              }}
-            >
-              We believe that great food has the power to bring people together. Our mission is 
-              to create an authentic Mediterranean dining experience that transports our guests 
-              to the sunny coasts of Greece, Italy, and Spain. We're committed to sustainability, 
-              supporting local farmers, and reducing our environmental impact.
-            </Typography>
-          </Box>
+          <Typography 
+            variant="h5" 
+            sx={{
+              fontFamily: "'Markazi Text', serif",
+              fontSize: { xs: '1.5rem', md: '1.75rem' },
+              mb: 2,
+              color: 'primary.main'
+            }}
+          >
+            Our Story
+          </Typography>
+          <Typography 
+            variant="body1" 
+            sx={{
+              fontSize: { xs: '1rem', md: '1.1rem' },
+              lineHeight: 1.8,
+              mb: 3
+            }}
+          >
+            Little Lemon is a charming Mediterranean restaurant that brings the flavors of the 
+            Mediterranean coast to Chicago. Our story began with a passion for authentic cuisine 
+            and a dream to create a warm, welcoming space where people can gather to enjoy 
+            delicious food and create lasting memories.
+          </Typography>
+          <Typography 
+            variant="body1" 
+            sx={{
+              fontSize: { xs: '1rem', md: '1.1rem' },
+              lineHeight: 1.8
+            }}
+          >
+            Founded by the Antonopoulos family, our restaurant combines traditional recipes 
+            passed down through generations with modern culinary techniques. Every dish we 
+            serve is crafted with love, using the freshest ingredients sourced from local 
+            markets and trusted Mediterranean suppliers.
+          </Typography>
         </Grid>
 
         <Grid item xs={12} md={6}>

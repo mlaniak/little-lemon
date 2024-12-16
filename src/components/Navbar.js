@@ -13,6 +13,7 @@ import {
   ListItemText,
   useScrollTrigger,
   Divider,
+  Container
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import LoginIcon from '@mui/icons-material/Login';
@@ -78,75 +79,116 @@ const Navbar = () => {
   return (
     <Box sx={{ mb: 2 }}>
       <AppBar 
-        position="fixed" 
-        elevation={trigger ? 4 : 0}
-        sx={{
-          bgcolor: 'primary.main',
-          transition: 'box-shadow 0.3s'
+        position="static" 
+        elevation={0}
+        sx={{ 
+          bgcolor: 'background.default',
+          height: 'auto'
         }}
       >
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography
-            variant="h6"
-            component={Link}
-            to="/"
-            sx={{
-              flexGrow: 1,
-              color: 'white',
-              textDecoration: 'none',
-              fontFamily: "'Markazi Text', serif",
-              fontSize: '2rem',
+        <Container 
+          maxWidth="lg"
+          sx={{
+            px: { xs: 2, sm: 3 }
+          }}
+        >
+          <Toolbar 
+            disableGutters 
+            sx={{ 
+              minHeight: '64px !important',
+              py: 1
             }}
           >
-            Little Lemon
-          </Typography>
-          <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center' }}>
-            {menuItems.map((item) => (
+            <Box
+              component={Link}
+              to="/"
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                textDecoration: 'none',
+                mr: 3
+              }}
+            >
+              <Box
+                component="img"
+                src={`${process.env.PUBLIC_URL}/assets/icons/Logo.svg`}
+                alt="Little Lemon"
+                sx={{
+                  height: 50,
+                  width: 'auto',
+                  display: 'block'
+                }}
+              />
+            </Box>
+
+            <Box sx={{ flexGrow: 1 }} />
+
+            <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 1 }}>
+              {menuItems.map((item) => (
+                <Button
+                  key={item.text}
+                  component={Link}
+                  to={item.path}
+                  sx={{ 
+                    color: 'text.primary',
+                    fontSize: '16pt',
+                    fontFamily: 'Karla, sans-serif',
+                    fontWeight: 500,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                    px: 2,
+                    py: 1,
+                    '&:hover': {
+                      backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                    }
+                  }}
+                >
+                  {item.text}
+                </Button>
+              ))}
               <Button
-                key={item.text}
                 component={Link}
-                to={item.path}
+                to="/login"
                 sx={{ 
-                  color: 'white',
-                  mx: 0.5,
+                  color: 'text.primary',
+                  fontSize: '16pt',
+                  fontFamily: 'Karla, sans-serif',
+                  fontWeight: 500,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                  px: 2,
+                  py: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  ml: 1,
                   '&:hover': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                    backgroundColor: 'rgba(0, 0, 0, 0.04)'
                   }
                 }}
+                startIcon={<LoginIcon />}
               >
-                {item.text}
+                Login
               </Button>
-            ))}
-            <Button
-              component={Link}
-              to="/login"
+            </Box>
+
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="end"
+              onClick={handleDrawerToggle}
               sx={{ 
-                color: 'white',
-                ml: 2,
-                border: '1px solid',
-                borderColor: 'rgba(255, 255, 255, 0.5)',
-                '&:hover': {
-                  borderColor: 'white',
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)'
-                }
+                display: { sm: 'none' },
+                color: 'text.primary',
+                p: 1,
+                ml: 1
               }}
-              startIcon={<LoginIcon />}
             >
-              Login
-            </Button>
-          </Box>
-        </Toolbar>
+              <MenuIcon />
+            </IconButton>
+          </Toolbar>
+        </Container>
       </AppBar>
-      <Toolbar /> {/* This toolbar acts as a spacer */}
       <Drawer
         variant="temporary"
         anchor="left"

@@ -91,7 +91,7 @@ const ImageGallery = ({ images }) => {
   return (
     <>
       <ImageList
-        variant="quilted"
+        variant="standard"
         cols={getCols()}
         gap={16}
         sx={{
@@ -99,57 +99,59 @@ const ImageGallery = ({ images }) => {
           '& .MuiImageListItem-root': {
             overflow: 'hidden',
             borderRadius: 2,
+            border: '1px solid rgba(0, 0, 0, 0.12)',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            '& img': {
+              height: '250px !important',
+              objectFit: 'cover',
+            },
+            '& .MuiImageListItemBar-root': {
+              background: 'rgba(0, 0, 0, 0.7)',
+              padding: '8px',
+            },
           },
         }}
       >
         {images.map((image, index) => (
-          <TouchFeedback key={index} onClick={() => handleOpen(image)}>
-            <ImageListItem
+          <ImageListItem 
+            key={index} 
+            onClick={() => handleOpen(image)}
+            sx={{
+              cursor: 'pointer',
+              aspectRatio: '4/3',
+              '& img': {
+                width: '100%',
+                height: '100% !important',
+                transform: 'none !important',
+              },
+            }}
+          >
+            <img
+              src={image.url}
+              alt={image.title}
+              loading="lazy"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+              }}
+            />
+            <Typography
+              variant="subtitle1"
               sx={{
-                cursor: 'pointer',
-                transition: 'transform 0.3s ease-in-out',
-                '&:hover': {
-                  transform: 'scale(1.02)',
-                },
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                bgcolor: 'rgba(0, 0, 0, 0.7)',
+                color: 'white',
+                padding: '8px',
+                textAlign: 'center',
               }}
             >
-              {loading && (
-                <Skeleton
-                  variant="rectangular"
-                  width="100%"
-                  height={200}
-                  animation="wave"
-                />
-              )}
-              <img
-                src={image.url}
-                alt={image.title}
-                loading="lazy"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  display: loading ? 'none' : 'block',
-                }}
-                onLoad={() => {
-                  simulateImageLoad();
-                }}
-              />
-              <Box
-                sx={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  bgcolor: 'rgba(0, 0, 0, 0.5)',
-                  color: 'white',
-                  p: 1,
-                }}
-              >
-                <Typography variant="subtitle1">{image.title}</Typography>
-              </Box>
-            </ImageListItem>
-          </TouchFeedback>
+              {image.title}
+            </Typography>
+          </ImageListItem>
         ))}
       </ImageList>
 
