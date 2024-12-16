@@ -16,8 +16,9 @@ import {
   Snackbar,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import "../components/DatePicker.css";
 
 const Reservations = () => {
   const [formData, setFormData] = useState({
@@ -277,17 +278,25 @@ const Reservations = () => {
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <DatePicker
-                  label="Date"
-                  value={formData.date}
-                  onChange={handleDateChange}
-                  renderInput={(params) => (
-                    <TextField {...params} fullWidth required variant="outlined" />
-                  )}
-                  minDate={new Date()}
-                />
-              </LocalizationProvider>
+              <DatePicker
+                selected={formData.date}
+                onChange={handleDateChange}
+                dateFormat="MMMM d, yyyy"
+                minDate={new Date()}
+                placeholderText="Select a date"
+                customInput={
+                  <TextField
+                    required
+                    fullWidth
+                    label="Date"
+                    sx={{ backgroundColor: 'white' }}
+                  />
+                }
+                popperProps={{
+                  positionFixed: true
+                }}
+                popperPlacement="bottom-start"
+              />
             </Grid>
             <Grid item xs={12} sm={6}>
               <Grid container spacing={2}>
