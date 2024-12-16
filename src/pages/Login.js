@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import {
   Container,
   Typography,
@@ -12,26 +15,33 @@ import {
 import { Link as RouterLink } from 'react-router-dom';
 import { Google as GoogleIcon, Facebook as FacebookIcon } from '@mui/icons-material';
 
+// Form validation schema
+const loginSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number'),
+});
+
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === 'email') {
-      setEmail(value);
-    } else if (name === 'password') {
-      setPassword(value);
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  const onSubmit = async (data) => {
     // Simulating API call
     await new Promise(resolve => setTimeout(resolve, 1000));
-    setLoading(false);
+    console.log('Form submitted:', data);
   };
 
   return (
@@ -66,25 +76,22 @@ const Login = () => {
           Login
         </Typography>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <TextField
             fullWidth
             label="Email"
-            name="email"
-            type="email"
-            value={email}
-            onChange={handleChange}
-            required
+            {...register('email')}
+            error={!!errors.email}
+            helperText={errors.email?.message}
             sx={{ mb: 2 }}
           />
           <TextField
             fullWidth
             label="Password"
-            name="password"
             type="password"
-            value={password}
-            onChange={handleChange}
-            required
+            {...register('password')}
+            error={!!errors.password}
+            helperText={errors.password?.message}
             sx={{ mb: 3 }}
           />
           <Button
@@ -94,43 +101,26 @@ const Login = () => {
             fullWidth
             size="large"
             sx={{ mb: 2 }}
-            disabled={loading}
+            disabled={isSubmitting}
           >
-            {loading ? 'Loading...' : 'Login'}
+            {isSubmitting ? 'Loading...' : 'Login'}
           </Button>
         </form>
 
-        <Box sx={{ textAlign: 'center', mb: 3 }}>
-          <Link 
-            component={RouterLink} 
-            to="/forgot-password"
-            sx={{ 
-              color: 'primary.main',
-              textDecoration: 'none',
-              '&:hover': {
-                textDecoration: 'underline'
-              }
-            }}
-          >
-            Forgot password?
+        <Box sx={{ textAlign: 'center', mb: 2 }}>
+          <Link component={RouterLink} to="/forgot-password" color="primary">
+            Forgot Password?
           </Link>
         </Box>
 
-        <Divider sx={{ my: 3 }}>OR</Divider>
+        <Divider sx={{ my: 3 }}>or</Divider>
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <Button
             variant="outlined"
             fullWidth
             startIcon={<GoogleIcon />}
-            sx={{
-              borderColor: '#DB4437',
-              color: '#DB4437',
-              '&:hover': {
-                borderColor: '#DB4437',
-                backgroundColor: 'rgba(219, 68, 55, 0.04)'
-              }
-            }}
+            onClick={() => console.log('Google login')}
           >
             Continue with Google
           </Button>
@@ -138,14 +128,7 @@ const Login = () => {
             variant="outlined"
             fullWidth
             startIcon={<FacebookIcon />}
-            sx={{
-              borderColor: '#4267B2',
-              color: '#4267B2',
-              '&:hover': {
-                borderColor: '#4267B2',
-                backgroundColor: 'rgba(66, 103, 178, 0.04)'
-              }
-            }}
+            onClick={() => console.log('Facebook login')}
           >
             Continue with Facebook
           </Button>
@@ -154,17 +137,7 @@ const Login = () => {
         <Box sx={{ textAlign: 'center', mt: 3 }}>
           <Typography variant="body2" color="text.secondary">
             Don't have an account?{' '}
-            <Link 
-              component={RouterLink} 
-              to="/register"
-              sx={{ 
-                color: 'primary.main',
-                textDecoration: 'none',
-                '&:hover': {
-                  textDecoration: 'underline'
-                }
-              }}
-            >
+            <Link component={RouterLink} to="/signup" color="primary">
               Sign up
             </Link>
           </Typography>
