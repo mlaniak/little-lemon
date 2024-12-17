@@ -31,7 +31,7 @@ const Navbar = () => {
     { text: 'Order Online', path: '/order' },
   ];
 
-  const drawer = (
+  const drawerContent = (
     <>
       <List>
         {menuItems.map((item) => (
@@ -206,39 +206,7 @@ const Navbar = () => {
           role="navigation"
           aria-label="mobile navigation"
         >
-          <List>
-            {menuItems.map((item) => (
-              <ListItem 
-                key={item.text} 
-                component={Link} 
-                to={item.path}
-                sx={{
-                  color: 'text.primary',
-                  '&:hover': {
-                    bgcolor: 'action.hover'
-                  }
-                }}
-              >
-                <ListItemText primary={item.text} />
-              </ListItem>
-            ))}
-          </List>
-          <Divider />
-          <List>
-            <ListItem
-              button
-              component={Link}
-              to="/login"
-              sx={{
-                color: 'text.primary',
-                '&:hover': {
-                  bgcolor: 'action.hover'
-                }
-              }}
-            >
-              <ListItemText primary="Login" />
-            </ListItem>
-          </List>
+          {drawerContent}
         </Box>
       </Drawer>
     </Box>
