@@ -159,16 +159,21 @@ const Home = () => {
                 <article style={{ height: '100%' }}>
                   <Card 
                     sx={{ 
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      borderRadius: 2,
-                      overflow: 'hidden',
-                      boxShadow: 2,
+                      height: '100%', 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      borderRadius: 2, 
+                      overflow: 'hidden', 
+                      boxShadow: 2, 
                       transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
                       '&:hover': {
                         transform: 'translateY(-4px)',
                         boxShadow: 4,
+                      },
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        transform: 'translateY(-8px)',
+                        boxShadow: 6
                       }
                     }}
                   >
@@ -300,24 +305,71 @@ const Home = () => {
             <Grid container spacing={4} justifyContent="center" sx={{ mb: 4 }}>
               {testimonials.map((testimonial, index) => (
                 <Grid item xs={12} sm={6} md={4} key={index}>
-                  <article>
-                    <Card sx={{ height: '100%' }}>
-                      <CardContent sx={{ flexGrow: 1, p: 3 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                          <Avatar src={testimonial.image} alt={testimonial.name} sx={{ width: 56, height: 56, mr: 2, border: 2, borderColor: 'primary.main' }} />
-                          <Box>
-                            <Typography variant="h6" component="h3" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
-                              {testimonial.name}
-                            </Typography>
-                            <Rating value={testimonial.rating} readOnly size="small" sx={{ color: 'secondary.main' }} />
-                          </Box>
+                  <Card 
+                    sx={{ 
+                      height: '100%',
+                      minHeight: '280px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        transform: 'translateY(-8px)',
+                        boxShadow: 6
+                      }
+                    }}
+                  >
+                    <CardContent 
+                      sx={{ 
+                        p: 3, 
+                        flex: 1,
+                        display: 'flex', 
+                        flexDirection: 'column',
+                        gap: 2
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                        <Avatar 
+                          src={testimonial.image} 
+                          alt={testimonial.name} 
+                          sx={{ 
+                            width: 64, 
+                            height: 64, 
+                            mr: 2, 
+                            border: 2, 
+                            borderColor: 'primary.main' 
+                          }} 
+                        />
+                        <Box>
+                          <Typography 
+                            variant="h6" 
+                            component="h3" 
+                            sx={{ 
+                              fontWeight: 'bold', 
+                              color: 'text.primary',
+                              mb: 0.5
+                            }}
+                          >
+                            {testimonial.name}
+                          </Typography>
+                          <Rating value={testimonial.rating} readOnly size="small" sx={{ color: 'secondary.main' }} />
                         </Box>
-                        <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', lineHeight: 1.6 }}>
-                          "{testimonial.review}"
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  </article>
+                      </Box>
+                      <Typography 
+                        variant="body1" 
+                        sx={{ 
+                          flex: 1,
+                          fontStyle: 'italic',
+                          color: 'text.secondary',
+                          lineHeight: 1.6
+                        }}
+                      >
+                        "{testimonial.review}"
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {testimonial.date}
+                      </Typography>
+                    </CardContent>
+                  </Card>
                 </Grid>
               ))}
             </Grid>
