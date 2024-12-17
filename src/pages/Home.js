@@ -1,7 +1,9 @@
 import React from 'react';
-import { Container, Typography, Button, Box, Grid, Card, CardContent, CardMedia, Rating, Avatar } from '@mui/material';
+import { Container, Typography, Button, Box, Card, CardContent, CardMedia, Rating, Avatar, Grid } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import SocialShare from '../components/SocialShare';
+import GridLayout from '../components/GridLayout';
+import FlexLayout from '../components/FlexLayout';
 
 const Home = () => {
   const specials = [
@@ -125,7 +127,7 @@ const Home = () => {
       {/* Specials Section */}
       <section aria-label="specials">
         <Container maxWidth="lg" sx={{ py: { xs: 6, md: 8 } }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+          <FlexLayout justify="space-between" align="center" sx={{ mb: 4 }}>
             <Typography 
               variant="h2"
               sx={{
@@ -151,142 +153,83 @@ const Home = () => {
             >
               Online Menu
             </Button>
-          </Box>
+          </FlexLayout>
 
-          <Grid container spacing={4}>
+          <GridLayout>
             {specials.map((special, index) => (
-              <Grid item xs={12} sm={6} md={4} key={index}>
-                <article style={{ height: '100%' }}>
-                  <Card 
-                    sx={{ 
-                      height: '100%', 
-                      display: 'flex', 
-                      flexDirection: 'column', 
-                      borderRadius: 2, 
-                      overflow: 'hidden', 
-                      boxShadow: 2, 
-                      transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+              <Card 
+                key={index}
+                sx={{ 
+                  height: '100%', 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  borderRadius: 2, 
+                  overflow: 'hidden', 
+                  boxShadow: 2, 
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: 4
+                  }
+                }}
+              >
+                <Box
+                  sx={{
+                    position: 'relative',
+                    width: '100%',
+                    pt: '56.25%', // 16:9 aspect ratio
+                    overflow: 'hidden'
+                  }}
+                >
+                  <CardMedia
+                    component="img"
+                    image={special.image}
+                    alt={special.name}
+                    sx={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover'
+                    }}
+                  />
+                </Box>
+                <CardContent sx={{ flexGrow: 1, p: 3 }}>
+                  <FlexLayout justify="space-between" align="center" sx={{ mb: 2 }}>
+                    <Typography variant="h6" component="h3" sx={{ fontWeight: 'bold' }}>
+                      {special.title}
+                    </Typography>
+                    <Typography 
+                      variant="h6" 
+                      sx={{ 
+                        color: 'primary.main',
+                        fontWeight: 'bold' 
+                      }}
+                    >
+                      {special.price}
+                    </Typography>
+                  </FlexLayout>
+                  <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+                    {special.description}
+                  </Typography>
+                  <Button
+                    variant="text"
+                    color="primary"
+                    sx={{
+                      p: 0,
                       '&:hover': {
-                        transform: 'translateY(-4px)',
-                        boxShadow: 4,
+                        bgcolor: 'transparent',
+                        textDecoration: 'underline'
                       }
                     }}
                   >
-                    <Box
-                      sx={{
-                        position: 'relative',
-                        width: '100%',
-                        pt: '56.25%', // 16:9 aspect ratio
-                        overflow: 'hidden',
-                      }}
-                    >
-                      <CardMedia
-                        component="img"
-                        image={special.image}
-                        alt={special.title}
-                        sx={{
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          transition: 'transform 0.3s ease-in-out',
-                          '&:hover': {
-                            transform: 'scale(1.05)',
-                          }
-                        }}
-                      />
-                    </Box>
-                    <CardContent 
-                      sx={{ 
-                        flexGrow: 1,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        bgcolor: 'background.paper',
-                        p: 3
-                      }}
-                    >
-                      <Box 
-                        sx={{ 
-                          display: 'flex', 
-                          justifyContent: 'space-between', 
-                          alignItems: 'center',
-                          mb: 2
-                        }}
-                      >
-                        <Typography 
-                          variant="h6" 
-                          component="h3"
-                          sx={{
-                            fontWeight: 'bold',
-                            color: 'text.primary',
-                            transition: 'color 0.2s ease-in-out',
-                            '&:hover': {
-                              color: 'primary.main',
-                            }
-                          }}
-                        >
-                          {special.title}
-                        </Typography>
-                        <Typography 
-                          variant="h6" 
-                          sx={{ 
-                            color: 'primary.main',
-                            fontWeight: 500,
-                            transition: 'transform 0.2s ease-in-out',
-                            '&:hover': {
-                              transform: 'scale(1.05)',
-                            }
-                          }}
-                        >
-                          {special.price}
-                        </Typography>
-                      </Box>
-                      <Typography 
-                        variant="body2" 
-                        color="text.secondary"
-                        sx={{ 
-                          mb: 2,
-                          flexGrow: 1
-                        }}
-                      >
-                        {special.description}
-                      </Typography>
-                      <Button
-                        size="medium"
-                        sx={{ 
-                          alignSelf: 'flex-start',
-                          color: 'text.primary',
-                          pl: 0,
-                          position: 'relative',
-                          '&:hover': {
-                            bgcolor: 'transparent',
-                            color: 'primary.main',
-                          },
-                          '&::after': {
-                            content: '""',
-                            position: 'absolute',
-                            width: '0%',
-                            height: '2px',
-                            bottom: 0,
-                            left: 0,
-                            bgcolor: 'primary.main',
-                            transition: 'width 0.3s ease-in-out',
-                          },
-                          '&:hover::after': {
-                            width: '100%',
-                          }
-                        }}
-                      >
-                        Order a delivery
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </article>
-              </Grid>
+                    Order a delivery
+                  </Button>
+                </CardContent>
+              </Card>
             ))}
-          </Grid>
+          </GridLayout>
         </Container>
       </section>
 
@@ -297,77 +240,76 @@ const Home = () => {
             <Typography variant="h4" component="h2" align="center" sx={{ mb: 6, color: 'white', fontWeight: 'bold', textTransform: 'uppercase' }}>
               What our customers say
             </Typography>
-            <Grid container spacing={4} justifyContent="center" sx={{ mb: 4 }}>
+            <GridLayout>
               {testimonials.map((testimonial, index) => (
-                <Grid item xs={12} sm={6} md={4} key={index}>
-                  <Card 
+                <Card 
+                  key={index}
+                  sx={{ 
+                    height: '100%',
+                    minHeight: '280px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: 6
+                    }
+                  }}
+                >
+                  <CardContent 
                     sx={{ 
-                      height: '100%',
-                      minHeight: '280px',
-                      display: 'flex',
+                      p: 3, 
+                      flex: 1,
+                      display: 'flex', 
                       flexDirection: 'column',
-                      transition: 'all 0.3s ease',
-                      '&:hover': {
-                        transform: 'translateY(-8px)',
-                        boxShadow: 6
-                      }
+                      gap: 2
                     }}
                   >
-                    <CardContent 
+                    <FlexLayout align="center" sx={{ mb: 1 }}>
+                      <Avatar 
+                        src={testimonial.image} 
+                        alt={testimonial.name} 
+                        sx={{ 
+                          width: 64, 
+                          height: 64, 
+                          mr: 2, 
+                          border: 2, 
+                          borderColor: 'primary.main' 
+                        }} 
+                      />
+                      <Box>
+                        <Typography 
+                          variant="h6" 
+                          component="h3" 
+                          sx={{ 
+                            fontWeight: 'bold', 
+                            color: 'text.primary',
+                            mb: 0.5
+                          }}
+                        >
+                          {testimonial.name}
+                        </Typography>
+                        <Rating value={testimonial.rating} readOnly size="small" sx={{ color: 'secondary.main' }} />
+                      </Box>
+                    </FlexLayout>
+                    <Typography 
+                      variant="body1" 
                       sx={{ 
-                        p: 3, 
                         flex: 1,
-                        display: 'flex', 
-                        flexDirection: 'column',
-                        gap: 2
+                        fontStyle: 'italic',
+                        color: 'text.secondary',
+                        lineHeight: 1.6
                       }}
                     >
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                        <Avatar 
-                          src={testimonial.image} 
-                          alt={testimonial.name} 
-                          sx={{ 
-                            width: 64, 
-                            height: 64, 
-                            mr: 2, 
-                            border: 2, 
-                            borderColor: 'primary.main' 
-                          }} 
-                        />
-                        <Box>
-                          <Typography 
-                            variant="h6" 
-                            component="h3" 
-                            sx={{ 
-                              fontWeight: 'bold', 
-                              color: 'text.primary',
-                              mb: 0.5
-                            }}
-                          >
-                            {testimonial.name}
-                          </Typography>
-                          <Rating value={testimonial.rating} readOnly size="small" sx={{ color: 'secondary.main' }} />
-                        </Box>
-                      </Box>
-                      <Typography 
-                        variant="body1" 
-                        sx={{ 
-                          flex: 1,
-                          fontStyle: 'italic',
-                          color: 'text.secondary',
-                          lineHeight: 1.6
-                        }}
-                      >
-                        "{testimonial.review}"
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {testimonial.date}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
+                      "{testimonial.review}"
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {testimonial.date}
+                    </Typography>
+                  </CardContent>
+                </Card>
               ))}
-            </Grid>
+            </GridLayout>
           </Container>
         </Box>
       </section>
@@ -394,18 +336,46 @@ const Home = () => {
                 </Box>
               </Grid>
               <Grid item xs={12} md={6}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <Box sx={{ position: 'relative', height: 300, width: '100%', borderRadius: 2, overflow: 'hidden' }}>
-                      <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800" alt="Chef cooking with flames" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Box sx={{ position: 'relative', height: 300, width: '100%', borderRadius: 2, overflow: 'hidden' }}>
-                      <img src="https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?w=800" alt="Chef presenting a dish" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </Box>
-                  </Grid>
-                </Grid>
+                <Box sx={{ position: 'relative', height: 500, width: '100%' }}>
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '60%',
+                      height: '350px',
+                      borderRadius: 2,
+                      overflow: 'hidden',
+                      boxShadow: 3,
+                      zIndex: 1
+                    }}
+                  >
+                    <img 
+                      src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800" 
+                      alt="Chef cooking with flames" 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                    />
+                  </Box>
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      bottom: 0,
+                      right: 0,
+                      width: '60%',
+                      height: '350px',
+                      borderRadius: 2,
+                      overflow: 'hidden',
+                      boxShadow: 3,
+                      zIndex: 2
+                    }}
+                  >
+                    <img 
+                      src="https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?w=800" 
+                      alt="Chef presenting a dish" 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                    />
+                  </Box>
+                </Box>
               </Grid>
             </Grid>
           </Container>
