@@ -54,7 +54,7 @@ const Home = () => {
   return (
     <>
       {/* Hero Section */}
-      <section aria-label="hero">
+      <header aria-label="hero">
         <Box sx={{ bgcolor: 'primary.main', color: 'white', py: { xs: 6, md: 8 } }}>
           <Container maxWidth="lg">
             <Grid container spacing={4} alignItems="center">
@@ -122,112 +122,116 @@ const Home = () => {
             </Grid>
           </Container>
         </Box>
-      </section>
+      </header>
 
       {/* Specials Section */}
       <section aria-label="specials">
         <Container maxWidth="lg" sx={{ py: { xs: 6, md: 8 } }}>
-          <FlexLayout justify="space-between" align="center" sx={{ mb: 4 }}>
-            <Typography 
-              variant="h2"
-              sx={{
-                fontSize: { xs: '2rem', md: '2.5rem' }
-              }}
-            >
-              This week's specials!
-            </Typography>
-            <Button
-              component={RouterLink}
-              to="/menu"
-              variant="contained"
-              sx={{
-                bgcolor: 'secondary.main',
-                color: 'text.primary',
-                fontSize: { xs: '0.9rem', md: '1rem' },
-                py: 1,
-                px: 3,
-                '&:hover': {
-                  bgcolor: 'secondary.dark'
-                }
-              }}
-            >
-              Online Menu
-            </Button>
-          </FlexLayout>
-
-          <GridLayout>
-            {specials.map((special, index) => (
-              <Card 
-                key={index}
-                sx={{ 
-                  height: '100%', 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  borderRadius: 2, 
-                  overflow: 'hidden', 
-                  boxShadow: 2, 
-                  transition: 'all 0.3s ease',
+          <header>
+            <FlexLayout justify="space-between" align="center" sx={{ mb: 4 }}>
+              <Typography 
+                variant="h2"
+                sx={{
+                  fontSize: { xs: '2rem', md: '2.5rem' },
+                  fontWeight: 'bold'
+                }}
+              >
+                This week's specials!
+              </Typography>
+              <Button
+                component={RouterLink}
+                to="/menu"
+                variant="contained"
+                sx={{
+                  bgcolor: 'secondary.main',
+                  color: 'text.primary',
+                  fontSize: { xs: '0.9rem', md: '1rem' },
+                  py: 1,
+                  px: 3,
                   '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: 4
+                    bgcolor: 'secondary.dark'
                   }
                 }}
               >
-                <Box
-                  sx={{
-                    position: 'relative',
-                    width: '100%',
-                    pt: '56.25%', // 16:9 aspect ratio
-                    overflow: 'hidden'
+                Online Menu
+              </Button>
+            </FlexLayout>
+          </header>
+
+          <GridLayout>
+            {specials.map((special, index) => (
+              <article key={index}>
+                <Card 
+                  sx={{ 
+                    height: '100%', 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    borderRadius: 2, 
+                    overflow: 'hidden', 
+                    boxShadow: 2, 
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: 4
+                    }
                   }}
                 >
-                  <CardMedia
-                    component="img"
-                    image={special.image}
-                    alt={special.name}
+                  <Box
                     sx={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
+                      position: 'relative',
                       width: '100%',
-                      height: '100%',
-                      objectFit: 'cover'
-                    }}
-                  />
-                </Box>
-                <CardContent sx={{ flexGrow: 1, p: 3 }}>
-                  <FlexLayout justify="space-between" align="center" sx={{ mb: 2 }}>
-                    <Typography variant="h6" component="h3" sx={{ fontWeight: 'bold' }}>
-                      {special.title}
-                    </Typography>
-                    <Typography 
-                      variant="h6" 
-                      sx={{ 
-                        color: 'primary.main',
-                        fontWeight: 'bold' 
-                      }}
-                    >
-                      {special.price}
-                    </Typography>
-                  </FlexLayout>
-                  <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-                    {special.description}
-                  </Typography>
-                  <Button
-                    variant="text"
-                    color="primary"
-                    sx={{
-                      p: 0,
-                      '&:hover': {
-                        bgcolor: 'transparent',
-                        textDecoration: 'underline'
-                      }
+                      pt: '56.25%', // 16:9 aspect ratio
+                      overflow: 'hidden'
                     }}
                   >
-                    Order a delivery
-                  </Button>
-                </CardContent>
-              </Card>
+                    <CardMedia
+                      component="img"
+                      image={special.image}
+                      alt={special.name}
+                      sx={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover'
+                      }}
+                    />
+                  </Box>
+                  <CardContent sx={{ flexGrow: 1, p: 3 }}>
+                    <FlexLayout justify="space-between" align="center" sx={{ mb: 2 }}>
+                      <Typography variant="h6" component="h3" sx={{ fontWeight: 'bold' }}>
+                        {special.title}
+                      </Typography>
+                      <Typography 
+                        variant="h6" 
+                        sx={{ 
+                          color: 'primary.main',
+                          fontWeight: 'bold' 
+                        }}
+                      >
+                        {special.price}
+                      </Typography>
+                    </FlexLayout>
+                    <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+                      {special.description}
+                    </Typography>
+                    <Button
+                      variant="text"
+                      color="primary"
+                      sx={{
+                        p: 0,
+                        '&:hover': {
+                          bgcolor: 'transparent',
+                          textDecoration: 'underline'
+                        }
+                      }}
+                    >
+                      Order a delivery
+                    </Button>
+                  </CardContent>
+                </Card>
+              </article>
             ))}
           </GridLayout>
         </Container>

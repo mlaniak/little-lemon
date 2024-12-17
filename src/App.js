@@ -35,8 +35,10 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <Router>
-        <div className="App">
-          <Navbar />
+        <>
+          <header>
+            <Navbar />
+          </header>
           <main>
             <Routes>
               <Route path="/" element={<Home />} />
@@ -48,7 +50,7 @@ function App() {
             </Routes>
           </main>
           <Footer />
-        </div>
+        </>
       </Router>
     </ThemeProvider>
   );
