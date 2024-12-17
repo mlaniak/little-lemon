@@ -32,7 +32,7 @@ const Navbar = () => {
   ];
 
   const drawer = (
-    <Box sx={{ width: 250 }} role="presentation">
+    <>
       <List>
         {menuItems.map((item) => (
           <ListItem
@@ -67,7 +67,7 @@ const Navbar = () => {
           />
         </ListItem>
       </List>
-    </Box>
+    </>
   );
 
   return (
@@ -199,7 +199,47 @@ const Navbar = () => {
           },
         }}
       >
-        {drawer}
+        <Box
+          component="nav"
+          onClick={handleDrawerToggle}
+          sx={{ width: 250 }}
+          role="navigation"
+          aria-label="mobile navigation"
+        >
+          <List>
+            {menuItems.map((item) => (
+              <ListItem 
+                key={item.text} 
+                component={Link} 
+                to={item.path}
+                sx={{
+                  color: 'text.primary',
+                  '&:hover': {
+                    bgcolor: 'action.hover'
+                  }
+                }}
+              >
+                <ListItemText primary={item.text} />
+              </ListItem>
+            ))}
+          </List>
+          <Divider />
+          <List>
+            <ListItem
+              button
+              component={Link}
+              to="/login"
+              sx={{
+                color: 'text.primary',
+                '&:hover': {
+                  bgcolor: 'action.hover'
+                }
+              }}
+            >
+              <ListItemText primary="Login" />
+            </ListItem>
+          </List>
+        </Box>
       </Drawer>
     </Box>
   );
