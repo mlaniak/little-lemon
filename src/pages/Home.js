@@ -169,11 +169,6 @@ const Home = () => {
                       '&:hover': {
                         transform: 'translateY(-4px)',
                         boxShadow: 4,
-                      },
-                      transition: 'all 0.3s ease',
-                      '&:hover': {
-                        transform: 'translateY(-8px)',
-                        boxShadow: 6
                       }
                     }}
                   >
