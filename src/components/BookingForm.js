@@ -60,21 +60,10 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
   const [availableTimes, setAvailableTimes] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [formData, setFormData] = useState({
-    name: initialValues?.name || '',
-    email: initialValues?.email || '',
-    phone: initialValues?.phone || '',
-    date: initialValues?.date || new Date(),
-    time: initialValues?.time || '',
-    guests: initialValues?.guests || 2,
-    occasion: initialValues?.occasion || '',
-    seating: initialValues?.seating || '',
-    specialRequests: initialValues?.specialRequests || '',
-  });
 
   const form = useForm({
     resolver: zodResolver(bookingSchema),
-    defaultValues: formData,
+    defaultValues: initialValues,
     mode: 'onBlur'
   });
 

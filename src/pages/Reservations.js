@@ -19,7 +19,6 @@ const Reservations = () => {
   });
 
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleSubmitSuccess = () => {
     setSnackbar({
