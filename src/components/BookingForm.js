@@ -1,4 +1,4 @@
-import React, { useContext, useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import React, { useContext, useState, useCallback, useMemo, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -81,7 +81,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
   const [currentIndex, setCurrentIndex] = useState(-1);
   const [lastUpdate, setLastUpdate] = useState(null);
 
-  const defaultValues = {
+  const defaultValues = useMemo(() => ({
     name: '',
     email: '',
     phone: '',
@@ -91,7 +91,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
     occasion: '',
     seating: 'no preference',
     specialRequests: ''
-  };
+  }), []);
 
   const form = useForm({
     resolver: zodResolver(bookingSchema),
@@ -99,7 +99,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
     defaultValues: initialValues || defaultValues,
   });
 
-  const { handleSubmit, formState: { errors }, setValue, trigger, watch } = form;
+  const { handleSubmit, formState: { errors }, setValue, watch } = form;
   
   const isUndoDisabled = currentIndex <= 0;
   const isRedoDisabled = currentIndex >= history.length - 1;
@@ -214,14 +214,8 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
   const watchedStep2Values = watch(['date', 'time', 'guests']);
   console.log('Watched step 2 values:', watchedStep2Values);
 
-  const fields = useMemo(() => ({
-    0: ['name', 'email', 'phone'],
-    1: ['date', 'time', 'guests'],
-    2: ['occasion', 'seating', 'specialRequests']
-  }), []);
-
   // Format time to 12-hour format
-  const formatTime = (time) => {
+  const formatTime = useMemo(() => (time) => {
     if (!time) return '';
     if (time.includes('AM') || time.includes('PM')) {
       return time;
@@ -232,7 +226,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
     const ampm = hour >= 12 ? 'PM' : 'AM';
     const hour12 = hour % 12 || 12;
     return `${hour12}:${minutes} ${ampm}`;
-  };
+  }, []);
 
   const isStepValid = useCallback((step) => {
     const values = watch();
@@ -271,7 +265,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
     
     // For step 3 (preferences)
     if (step === 2) {
-      const { occasion, seating, specialRequests } = values;
+      const { occasion, seating } = values;
       return Boolean(occasion) && Boolean(seating);
     }
     
@@ -279,17 +273,10 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
   }, [watch]);
 
   const handleNext = useCallback(() => {
-    const values = watch();
-    console.log('Handle Next clicked:', {
-      step: activeStep,
-      values,
-      isValid: isStepValid(activeStep)
-    });
-    
     if (isStepValid(activeStep)) {
-      setActiveStep((prev) => Math.min(prev + 1, 2));
+      setActiveStep((prevStep) => prevStep + 1);
     }
-  }, [activeStep, isStepValid, watch]);
+  }, [isStepValid, activeStep, setValue]);
 
   const handleBack = useCallback(() => {
     setActiveStep((prev) => Math.max(prev - 1, 0));
