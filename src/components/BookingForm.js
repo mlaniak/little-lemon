@@ -33,7 +33,7 @@ const bookingSchema = z.object({
   time: z.string()
     .min(1, 'Please select a time'),
   guests: z.number()
-    .min(1, 'Minimum 1 guest required')
+    .min(1, 'At least 1 guest is required')
     .max(10, 'Maximum 10 guests allowed'),
   occasion: z.string()
     .min(1, 'Please select an occasion'),
@@ -246,9 +246,9 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
         <Grid item xs={12} sm={6}>
           <FormControl fullWidth error={!!form.formState.errors.guests}>
             <TextField
-              {...form.register('guests')}
-              label="Number of Guests"
               type="number"
+              label="Number of Guests"
+              {...form.register('guests', { valueAsNumber: true })}
               InputProps={{ 
                 inputProps: { 
                   min: 1, 
@@ -256,7 +256,8 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
                   'aria-label': 'Number of guests',
                 }
               }}
-              onChange={(e) => form.setValue('guests', Number(e.target.value))}
+              error={!!form.formState.errors.guests}
+              helperText={form.formState.errors.guests?.message}
               aria-invalid={!!form.formState.errors.guests}
               aria-describedby={form.formState.errors.guests ? 'guests-error' : undefined}
             />
