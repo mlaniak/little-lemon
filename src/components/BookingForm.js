@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useBookings } from '../hooks/useBookings';
-import useFormPersist from 'react-hook-form-persist';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../pages/DatePicker.css';
@@ -68,10 +67,6 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
   });
 
   const { handleSubmit, formState: { isValid } } = form;
-
-  const { formData } = useFormPersist('booking-form', {
-    storage: window.localStorage,
-  });
 
   const selectedDate = form.watch('date');
 
