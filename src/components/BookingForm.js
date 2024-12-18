@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import React from 'react';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+import { z } from 'zod';
+import { useBookings } from '../hooks/useBookings';
+import useFormPersist from 'react-hook-form-persist';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../pages/DatePicker.css';
@@ -16,8 +18,6 @@ import {
   Typography,
   Box
 } from '@mui/material';
-import { useBookingsContext } from '../contexts/BookingsContext';
-import useFormPersist from '../hooks/useFormPersist';
 import { useNavigate } from 'react-router-dom';
 
 // Form validation schema
@@ -56,7 +56,7 @@ const seatingOptions = [
 
 const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) => {
   const navigate = useNavigate();
-  const { getAvailableTimeSlots, addBooking, error } = useBookingsContext();
+  const { getAvailableTimeSlots, addBooking, error } = useBookings();
   const [availableTimes, setAvailableTimes] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -67,21 +67,15 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
     mode: 'onBlur'
   });
 
-  const { clearSavedData } = useFormPersist(form, 'booking-form');
+  const { handleSubmit, formState: { isValid } } = form;
 
-  const {
-    register,
-    handleSubmit,
-    control,
-    reset,
-    watch,
-    setValue,
-    formState: { errors },
-  } = form;
+  const { formData } = useFormPersist('booking-form', {
+    storage: window.localStorage,
+  });
 
-  const selectedDate = watch('date');
+  const selectedDate = form.watch('date');
 
-  useEffect(() => {
+  React.useEffect(() => {
     let isMounted = true;
 
     const fetchTimes = async () => {
@@ -92,7 +86,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
         const times = await getAvailableTimeSlots(selectedDate);
         if (isMounted) {
           setAvailableTimes(times || []);
-          setValue('time', '');
+          form.setValue('time', '');
         }
       } catch (error) {
         console.error('Error fetching times:', error);
@@ -111,7 +105,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
     return () => {
       isMounted = false;
     };
-  }, [selectedDate, getAvailableTimeSlots, setValue]);
+  }, [selectedDate, getAvailableTimeSlots, form.setValue]);
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
@@ -143,18 +137,18 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
           <TextField
             fullWidth
             label="Name"
-            {...register('name')}
-            error={!!errors.name}
-            helperText={errors.name?.message}
-            aria-invalid={!!errors.name}
-            aria-describedby={errors.name ? 'name-error' : undefined}
+            {...form.register('name')}
+            error={!!form.formState.errors.name}
+            helperText={form.formState.errors.name?.message}
+            aria-invalid={!!form.formState.errors.name}
+            aria-describedby={form.formState.errors.name ? 'name-error' : undefined}
             inputProps={{
               'aria-label': 'Name',
             }}
           />
-          {errors.name && (
+          {form.formState.errors.name && (
             <Typography id="name-error" role="alert" color="error" variant="caption">
-              {errors.name.message}
+              {form.formState.errors.name.message}
             </Typography>
           )}
         </Grid>
@@ -164,18 +158,18 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
             fullWidth
             label="Email"
             type="email"
-            {...register('email')}
-            error={!!errors.email}
-            helperText={errors.email?.message}
-            aria-invalid={!!errors.email}
-            aria-describedby={errors.email ? 'email-error' : undefined}
+            {...form.register('email')}
+            error={!!form.formState.errors.email}
+            helperText={form.formState.errors.email?.message}
+            aria-invalid={!!form.formState.errors.email}
+            aria-describedby={form.formState.errors.email ? 'email-error' : undefined}
             inputProps={{
               'aria-label': 'Email address',
             }}
           />
-          {errors.email && (
+          {form.formState.errors.email && (
             <Typography id="email-error" role="alert" color="error" variant="caption">
-              {errors.email.message}
+              {form.formState.errors.email.message}
             </Typography>
           )}
         </Grid>
@@ -185,182 +179,152 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
             fullWidth
             label="Phone"
             type="tel"
-            {...register('phone')}
-            error={!!errors.phone}
-            helperText={errors.phone?.message}
-            aria-invalid={!!errors.phone}
-            aria-describedby={errors.phone ? 'phone-error' : undefined}
+            {...form.register('phone')}
+            error={!!form.formState.errors.phone}
+            helperText={form.formState.errors.phone?.message}
+            aria-invalid={!!form.formState.errors.phone}
+            aria-describedby={form.formState.errors.phone ? 'phone-error' : undefined}
             inputProps={{
               'aria-label': 'Phone number',
               pattern: '[0-9]{10}'
             }}
           />
-          {errors.phone && (
+          {form.formState.errors.phone && (
             <Typography id="phone-error" role="alert" color="error" variant="caption">
-              {errors.phone.message}
+              {form.formState.errors.phone.message}
             </Typography>
           )}
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <Controller
-            control={control}
-            name="date"
-            render={({ field }) => (
-              <FormControl fullWidth error={!!errors.date}>
-                <DatePicker
-                  selected={field.value}
-                  onChange={(date) => field.onChange(date)}
-                  minDate={new Date()}
-                  placeholderText="Select Date"
-                  className="custom-datepicker"
-                  aria-label="Reservation date"
-                  aria-invalid={!!errors.date}
-                  aria-describedby={errors.date ? 'date-error' : undefined}
-                />
-                {errors.date && (
-                  <Typography id="date-error" role="alert" color="error" variant="caption">
-                    {errors.date.message}
-                  </Typography>
-                )}
-              </FormControl>
+          <FormControl fullWidth error={!!form.formState.errors.date}>
+            <DatePicker
+              selected={selectedDate}
+              onChange={(date) => form.setValue('date', date)}
+              minDate={new Date()}
+              placeholderText="Select Date"
+              className="custom-datepicker"
+              aria-label="Reservation date"
+              aria-invalid={!!form.formState.errors.date}
+              aria-describedby={form.formState.errors.date ? 'date-error' : undefined}
+            />
+            {form.formState.errors.date && (
+              <Typography id="date-error" role="alert" color="error" variant="caption">
+                {form.formState.errors.date.message}
+              </Typography>
             )}
-          />
+          </FormControl>
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <Controller
-            control={control}
-            name="time"
-            render={({ field }) => (
-              <FormControl fullWidth error={!!errors.time}>
-                <Select
-                  {...field}
-                  displayEmpty
-                  placeholder="Select a time"
-                  aria-label="Reservation time"
-                  aria-invalid={!!errors.time}
-                  aria-describedby={errors.time ? 'time-error' : undefined}
-                  sx={{
-                    '& .MuiSelect-select': {
-                      color: field.value ? 'inherit' : 'text.secondary',
-                    }
-                  }}
+          <FormControl fullWidth error={!!form.formState.errors.time}>
+            <Select
+              {...form.register('time')}
+              displayEmpty
+              placeholder="Select a time"
+              aria-label="Reservation time"
+              aria-invalid={!!form.formState.errors.time}
+              aria-describedby={form.formState.errors.time ? 'time-error' : undefined}
+              sx={{
+                '& .MuiSelect-select': {
+                  color: form.watch('time') ? 'inherit' : 'text.secondary',
+                }
+              }}
+            >
+              <MenuItem value="" disabled>
+                <em>Select a time</em>
+              </MenuItem>
+              {availableTimes.map((time) => (
+                <MenuItem 
+                  key={time} 
+                  value={time}
+                  aria-label={`Reserve table for ${time}`}
                 >
-                  <MenuItem value="" disabled>
-                    <em>Select a time</em>
-                  </MenuItem>
-                  {availableTimes.map((time) => (
-                    <MenuItem 
-                      key={time} 
-                      value={time}
-                      aria-label={`Reserve table for ${time}`}
-                    >
-                      {time}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors.time && (
-                  <Typography id="time-error" role="alert" color="error" variant="caption">
-                    {errors.time.message}
-                  </Typography>
-                )}
-              </FormControl>
+                  {time}
+                </MenuItem>
+              ))}
+            </Select>
+            {form.formState.errors.time && (
+              <Typography id="time-error" role="alert" color="error" variant="caption">
+                {form.formState.errors.time.message}
+              </Typography>
             )}
-          />
+          </FormControl>
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <Controller
-            control={control}
-            name="guests"
-            render={({ field }) => (
-              <FormControl fullWidth error={!!errors.guests}>
-                <TextField
-                  {...field}
-                  label="Number of Guests"
-                  type="number"
-                  InputProps={{ 
-                    inputProps: { 
-                      min: 1, 
-                      max: 10,
-                      'aria-label': 'Number of guests',
-                    }
-                  }}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
-                  aria-invalid={!!errors.guests}
-                  aria-describedby={errors.guests ? 'guests-error' : undefined}
-                />
-                {errors.guests && (
-                  <Typography id="guests-error" role="alert" color="error" variant="caption">
-                    {errors.guests.message}
-                  </Typography>
-                )}
-              </FormControl>
+          <FormControl fullWidth error={!!form.formState.errors.guests}>
+            <TextField
+              {...form.register('guests')}
+              label="Number of Guests"
+              type="number"
+              InputProps={{ 
+                inputProps: { 
+                  min: 1, 
+                  max: 10,
+                  'aria-label': 'Number of guests',
+                }
+              }}
+              onChange={(e) => form.setValue('guests', Number(e.target.value))}
+              aria-invalid={!!form.formState.errors.guests}
+              aria-describedby={form.formState.errors.guests ? 'guests-error' : undefined}
+            />
+            {form.formState.errors.guests && (
+              <Typography id="guests-error" role="alert" color="error" variant="caption">
+                {form.formState.errors.guests.message}
+              </Typography>
             )}
-          />
+          </FormControl>
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <Controller
-            control={control}
-            name="occasion"
-            render={({ field }) => (
-              <FormControl fullWidth error={!!errors.occasion}>
-                <InputLabel id="occasion-label">Occasion</InputLabel>
-                <Select
-                  {...field}
-                  labelId="occasion-label"
-                  label="Occasion"
-                  aria-label="Occasion"
-                  aria-invalid={!!errors.occasion}
-                  aria-describedby={errors.occasion ? 'occasion-error' : undefined}
-                >
-                  {occasions.map((occasion) => (
-                    <MenuItem key={occasion} value={occasion}>
-                      {occasion}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors.occasion && (
-                  <Typography id="occasion-error" role="alert" color="error" variant="caption">
-                    {errors.occasion.message}
-                  </Typography>
-                )}
-              </FormControl>
+          <FormControl fullWidth error={!!form.formState.errors.occasion}>
+            <InputLabel id="occasion-label">Occasion</InputLabel>
+            <Select
+              {...form.register('occasion')}
+              labelId="occasion-label"
+              label="Occasion"
+              aria-label="Occasion"
+              aria-invalid={!!form.formState.errors.occasion}
+              aria-describedby={form.formState.errors.occasion ? 'occasion-error' : undefined}
+            >
+              {occasions.map((occasion) => (
+                <MenuItem key={occasion} value={occasion}>
+                  {occasion}
+                </MenuItem>
+              ))}
+            </Select>
+            {form.formState.errors.occasion && (
+              <Typography id="occasion-error" role="alert" color="error" variant="caption">
+                {form.formState.errors.occasion.message}
+              </Typography>
             )}
-          />
+          </FormControl>
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <Controller
-            control={control}
-            name="seating"
-            render={({ field }) => (
-              <FormControl fullWidth error={!!errors.seating}>
-                <InputLabel id="seating-label">Seating Preference</InputLabel>
-                <Select
-                  {...field}
-                  labelId="seating-label"
-                  label="Seating Preference"
-                  aria-label="Seating preference"
-                  aria-invalid={!!errors.seating}
-                  aria-describedby={errors.seating ? 'seating-error' : undefined}
-                >
-                  {seatingOptions.map((option) => (
-                    <MenuItem key={option} value={option}>
-                      {option}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors.seating && (
-                  <Typography id="seating-error" role="alert" color="error" variant="caption">
-                    {errors.seating.message}
-                  </Typography>
-                )}
-              </FormControl>
+          <FormControl fullWidth error={!!form.formState.errors.seating}>
+            <InputLabel id="seating-label">Seating Preference</InputLabel>
+            <Select
+              {...form.register('seating')}
+              labelId="seating-label"
+              label="Seating Preference"
+              aria-label="Seating preference"
+              aria-invalid={!!form.formState.errors.seating}
+              aria-describedby={form.formState.errors.seating ? 'seating-error' : undefined}
+            >
+              {seatingOptions.map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </Select>
+            {form.formState.errors.seating && (
+              <Typography id="seating-error" role="alert" color="error" variant="caption">
+                {form.formState.errors.seating.message}
+              </Typography>
             )}
-          />
+          </FormControl>
         </Grid>
 
         <Grid item xs={12}>
@@ -369,16 +333,16 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
             label="Special Requests"
             multiline
             rows={4}
-            {...register('specialRequests')}
-            error={!!errors.specialRequests}
-            helperText={errors.specialRequests?.message}
+            {...form.register('specialRequests')}
+            error={!!form.formState.errors.specialRequests}
+            helperText={form.formState.errors.specialRequests?.message}
             aria-label="Special requests"
-            aria-invalid={!!errors.specialRequests}
-            aria-describedby={errors.specialRequests ? 'special-requests-error' : undefined}
+            aria-invalid={!!form.formState.errors.specialRequests}
+            aria-describedby={form.formState.errors.specialRequests ? 'special-requests-error' : undefined}
           />
-          {errors.specialRequests && (
+          {form.formState.errors.specialRequests && (
             <Typography id="special-requests-error" role="alert" color="error" variant="caption">
-              {errors.specialRequests.message}
+              {form.formState.errors.specialRequests.message}
             </Typography>
           )}
         </Grid>

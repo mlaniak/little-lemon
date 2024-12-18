@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  Container,
-  Typography,
-  Paper,
-  Snackbar,
-  Alert,
-  useMediaQuery,
-} from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import { Container, Snackbar, Alert } from '@mui/material';
 import BookingForm from '../components/BookingForm';
 import BookingsList from '../components/BookingsList';
 
@@ -17,8 +9,6 @@ const Reservations = () => {
     message: '',
     severity: 'success',
   });
-
-  const theme = useTheme();
 
   const handleSubmitSuccess = () => {
     setSnackbar({
@@ -41,35 +31,8 @@ const Reservations = () => {
         px: { xs: 2, md: 3 }
       }}
     >
-      <Typography 
-        variant="h1" 
-        component="h1"
-        align="center" 
-        gutterBottom
-        sx={{
-          fontSize: { xs: '2rem', md: '2.5rem' },
-          mb: { xs: 3, md: 4 },
-          color: 'primary.main'
-        }}
-        role="heading"
-        aria-level="1"
-      >
-        Reserve a Table
-      </Typography>
-
-      <Paper 
-        component="main"
-        elevation={3}
-        sx={{ 
-          p: 4, 
-          mt: 4 
-        }}
-        aria-label="Reservation form"
-      >
-        <BookingForm onSubmitSuccess={handleSubmitSuccess} />
-        <BookingsList />
-      </Paper>
-
+      <BookingForm onSubmitSuccess={handleSubmitSuccess} />
+      <BookingsList />
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
