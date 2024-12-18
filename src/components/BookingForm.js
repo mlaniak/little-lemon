@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useBookings } from '../hooks/useBookings';
+import { BookingsContext } from '../contexts/BookingsContext';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../pages/DatePicker.css';
@@ -55,7 +55,7 @@ const seatingOptions = [
 
 const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) => {
   const navigate = useNavigate();
-  const { getAvailableTimeSlots, addBooking, error } = useBookings();
+  const { getAvailableTimeSlots, addBooking } = useContext(BookingsContext);
   const [availableTimes, setAvailableTimes] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
