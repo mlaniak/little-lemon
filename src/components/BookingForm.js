@@ -276,7 +276,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
     if (isStepValid(activeStep)) {
       setActiveStep((prevStep) => prevStep + 1);
     }
-  }, [isStepValid, activeStep, setValue]);
+  }, [isStepValid, activeStep]);
 
   const handleBack = useCallback(() => {
     setActiveStep((prev) => Math.max(prev - 1, 0));
@@ -496,23 +496,17 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
                       aria-label="Select occasion"
                       aria-invalid={!!errors.occasion}
                       aria-describedby={errors.occasion ? 'occasion-error' : undefined}
-                      aria-required="true"
                     >
-                      {occasions.map((occasion) => (
-                        <MenuItem 
-                          key={occasion} 
-                          value={occasion}
-                          role="option"
-                          aria-label={occasion}
-                        >
-                          {occasion}
+                      {occasions.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
                         </MenuItem>
                       ))}
                     </Select>
                   </FormControl>
                 </Tooltip>
               </Grid>
-
+              
               <Grid item xs={12} sm={6}>
                 <Tooltip title="Choose your preferred seating area">
                   <FormControl fullWidth error={!!errors.seating}>
@@ -527,12 +521,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
                       aria-describedby={errors.seating ? 'seating-error' : undefined}
                     >
                       {seatingOptions.map((option) => (
-                        <MenuItem 
-                          key={option} 
-                          value={option}
-                          role="option"
-                          aria-label={option}
-                        >
+                        <MenuItem key={option} value={option}>
                           {option}
                         </MenuItem>
                       ))}
@@ -540,15 +529,13 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
                   </FormControl>
                 </Tooltip>
               </Grid>
-
+              
               <Grid item xs={12}>
-                <Tooltip title="Add any special requests or dietary requirements">
+                <Tooltip title="Add any special requests or notes for your reservation">
                   <FormControl fullWidth error={!!errors.specialRequests}>
                     <TextField
                       id="special-requests-input"
-                      fullWidth
                       label="Special Requests"
-                      placeholder="E.g., dietary restrictions, accessibility needs, or special occasions"
                       multiline
                       rows={4}
                       {...form.register('specialRequests')}
@@ -568,7 +555,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
       default:
         return null;
     }
-  }, [form, errors, availableTimes, selectedDate]);
+  }, [errors, form, availableTimes, formatTime, setValue]);
 
   return (
     <Box sx={{ width: '100%', mb: 4 }}>
