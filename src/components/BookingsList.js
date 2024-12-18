@@ -150,6 +150,7 @@ const BookingsList = () => {
                 </TableSortLabel>
               </TableCell>
               <TableCell>Seating</TableCell>
+              <TableCell>Special Requests</TableCell>
               <TableCell>Contact</TableCell>
               <TableCell align="center">Actions</TableCell>
             </TableRow>
@@ -163,6 +164,7 @@ const BookingsList = () => {
                 <TableCell>{booking.guests}</TableCell>
                 <TableCell>{booking.occasion}</TableCell>
                 <TableCell>{booking.seating}</TableCell>
+                <TableCell>{booking.specialRequests || '-'}</TableCell>
                 <TableCell>
                   {booking.email}<br />{booking.phone}
                 </TableCell>

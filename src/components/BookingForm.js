@@ -1,4 +1,4 @@
-import React, { useContext, useState, useCallback, useMemo } from 'react';
+import React, { useContext, useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -11,6 +11,7 @@ import {
   TextField,
   Button,
   FormControl,
+  FormHelperText,
   InputLabel,
   Select,
   MenuItem,
@@ -24,8 +25,11 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Paper
+  Paper,
+  IconButton
 } from '@mui/material';
+import UndoIcon from '@mui/icons-material/Undo';
+import RedoIcon from '@mui/icons-material/Redo';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 
@@ -71,6 +75,11 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
   const [activeStep, setActiveStep] = useState(0);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [formData, setFormData] = useState(null);
+  
+  // Add undo/redo state
+  const [history, setHistory] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(-1);
+  const [lastUpdate, setLastUpdate] = useState(null);
 
   const defaultValues = {
     name: '',
@@ -78,27 +87,137 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
     phone: '',
     date: null,
     time: '',
-    guests: '',
+    guests: 2,
     occasion: '',
-    seating: '',
+    seating: 'no preference',
     specialRequests: ''
   };
 
   const form = useForm({
     resolver: zodResolver(bookingSchema),
+    mode: 'onChange',
     defaultValues: initialValues || defaultValues,
-    mode: 'onBlur',
-    reValidateMode: 'onBlur'
   });
 
-  const { handleSubmit, watch, formState: { errors }, getValues } = form;
+  const { handleSubmit, formState: { errors }, setValue, trigger, watch } = form;
+  
+  const isUndoDisabled = currentIndex <= 0;
+  const isRedoDisabled = currentIndex >= history.length - 1;
+
+  const addToHistory = useCallback((values) => {
+    const valuesToStore = { ...values };
+    if (valuesToStore.date instanceof Date) {
+      valuesToStore.date = valuesToStore.date.toISOString();
+    }
+    
+    setHistory(prev => {
+      const newHistory = prev.slice(0, currentIndex + 1);
+      return [...newHistory, valuesToStore];
+    });
+    setCurrentIndex(prev => prev + 1);
+    setLastUpdate(Date.now());
+  }, [currentIndex]);
+
+  const handleUndo = useCallback(() => {
+    if (!isUndoDisabled && history.length > 0) {
+      const previousValues = history[currentIndex - 1];
+      if (previousValues) {
+        // Reset form to previous state
+        Object.entries(previousValues).forEach(([field, value]) => {
+          if (value !== undefined && value !== null) {
+            if (field === 'date' && value) {
+              setValue(field, new Date(value));
+            } else {
+              setValue(field, value);
+            }
+          }
+        });
+        setCurrentIndex(prev => prev - 1);
+      }
+    }
+  }, [history, currentIndex, isUndoDisabled, setValue]);
+
+  const handleRedo = useCallback(() => {
+    if (!isRedoDisabled && history.length > 0) {
+      const nextValues = history[currentIndex + 1];
+      if (nextValues) {
+        Object.entries(nextValues).forEach(([field, value]) => {
+          if (value !== undefined && value !== null) {
+            if (field === 'date' && value) {
+              setValue(field, new Date(value));
+            } else {
+              setValue(field, value);
+            }
+          }
+        });
+        setCurrentIndex(prev => prev + 1);
+      }
+    }
+  }, [history, currentIndex, isRedoDisabled, setValue]);
+
+  // Watch for form changes with debouncing
+  const watchAllFields = watch();
+  useEffect(() => {
+    // Prevent rapid updates
+    const now = Date.now();
+    if (lastUpdate && now - lastUpdate < 500) {
+      return;
+    }
+
+    // Skip empty or default values
+    const hasChanges = Object.entries(watchAllFields).some(([field, value]) => {
+      if (value === undefined || value === null) return false;
+      if (value === defaultValues[field]) return false;
+      if (typeof value === 'string' && value.trim() === '') return false;
+      return true;
+    });
+
+    if (hasChanges) {
+      const lastEntry = history[currentIndex];
+      const currentValues = { ...watchAllFields };
+      
+      // Convert date for comparison
+      if (currentValues.date instanceof Date) {
+        currentValues.date = currentValues.date.toISOString();
+      }
+
+      // Only add if different from last entry
+      if (!lastEntry || JSON.stringify(lastEntry) !== JSON.stringify(currentValues)) {
+        addToHistory(watchAllFields);
+      }
+    }
+  }, [watchAllFields, addToHistory, history, currentIndex, lastUpdate, defaultValues]);
+
+  // Add keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          handleRedo();
+        } else {
+          handleUndo();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [handleUndo, handleRedo]);
+
   const selectedDate = watch('date');
 
-  // Define fields object with useMemo to prevent recreation on every render
+  // Add form value watching for debugging
+  const watchedValues = watch(['name', 'email', 'phone']);
+  console.log('Watched form values:', watchedValues);
+
+  const watchedStep2Values = watch(['date', 'time', 'guests']);
+  console.log('Watched step 2 values:', watchedStep2Values);
+
   const fields = useMemo(() => ({
     0: ['name', 'email', 'phone'],
     1: ['date', 'time', 'guests'],
-    2: ['occasion', 'seating']
+    2: ['occasion', 'seating', 'specialRequests']
   }), []);
 
   // Format time to 12-hour format
@@ -116,20 +235,61 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
   };
 
   const isStepValid = useCallback((step) => {
-    const currentFields = fields[step] || [];
-    const values = getValues();
+    const values = watch();
+    console.log('Current form values:', values);
     
-    return currentFields.every(field => {
-      const value = values[field];
-      return value && value.toString().trim() !== '';
-    });
-  }, [getValues, fields]);
+    // For step 1 (contact info)
+    if (step === 0) {
+      const { name, email, phone } = values;
+      console.log('Step 1 fields:', { name, email, phone });
+      return Boolean(name) && Boolean(email) && Boolean(phone);
+    }
+    
+    // For step 2 (reservation details)
+    if (step === 1) {
+      const { date, time, guests } = values;
+      const guestsNumber = Number(guests);
+      
+      console.log('Step 2 validation check:', {
+        date: date instanceof Date ? date.toISOString() : date,
+        time,
+        guests,
+        guestsNumber,
+        dateType: typeof date,
+        timeType: typeof time,
+        guestsType: typeof guests
+      });
+      
+      const isDateValid = date instanceof Date || (typeof date === 'string' && date.length > 0);
+      const isTimeValid = typeof time === 'string' && time.length > 0;
+      const isGuestsValid = !isNaN(guestsNumber) && guestsNumber >= 1 && guestsNumber <= 10;
+      
+      console.log('Step 2 field validation:', { isDateValid, isTimeValid, isGuestsValid });
+      
+      return isDateValid && isTimeValid && isGuestsValid;
+    }
+    
+    // For step 3 (preferences)
+    if (step === 2) {
+      const { occasion, seating, specialRequests } = values;
+      return Boolean(occasion) && Boolean(seating);
+    }
+    
+    return false;
+  }, [watch]);
 
   const handleNext = useCallback(() => {
+    const values = watch();
+    console.log('Handle Next clicked:', {
+      step: activeStep,
+      values,
+      isValid: isStepValid(activeStep)
+    });
+    
     if (isStepValid(activeStep)) {
       setActiveStep((prev) => Math.min(prev + 1, 2));
     }
-  }, [activeStep, isStepValid]);
+  }, [activeStep, isStepValid, watch]);
 
   const handleBack = useCallback(() => {
     setActiveStep((prev) => Math.max(prev - 1, 0));
@@ -168,7 +328,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
         const times = await getAvailableTimeSlots(selectedDate);
         if (isMounted) {
           setAvailableTimes(times || []);
-          form.setValue('time', '');
+          setValue('time', '');
         }
       } catch (error) {
         console.error('Error fetching times:', error);
@@ -186,7 +346,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
     return () => {
       isMounted = false;
     };
-  }, [selectedDate, getAvailableTimeSlots, form]);
+  }, [selectedDate, getAvailableTimeSlots, setValue]);
 
   const renderStepContent = useCallback((step) => {
     switch (step) {
@@ -194,89 +354,56 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
         return (
           <Paper elevation={0} sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom>Contact Information</Typography>
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6}>
-                <Tooltip title="Enter your full name as it appears on your ID">
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <Tooltip title="Enter your full name" placement="top">
                   <FormControl fullWidth error={!!errors.name}>
                     <TextField
-                      id="name"
-                      fullWidth
+                      id="name-input"
                       label="Name"
                       {...form.register('name')}
                       error={!!errors.name}
                       helperText={errors.name?.message}
-                      aria-invalid={!!errors.name}
-                      aria-describedby={errors.name ? 'name-error' : undefined}
-                      InputLabelProps={{
-                        shrink: true,
-                        id: 'name-label'
-                      }}
                       inputProps={{
-                        'aria-label': 'Full name',
-                        'aria-required': 'true',
-                        minLength: 2,
-                        maxLength: 50,
-                        required: true,
-                        autoComplete: 'name'
+                        'aria-label': 'Name',
+                        'aria-describedby': errors.name ? 'name-error' : undefined
                       }}
                     />
                   </FormControl>
                 </Tooltip>
               </Grid>
               
-              <Grid item xs={12} sm={6}>
-                <Tooltip title="Enter a valid email address where we can send your confirmation">
+              <Grid item xs={12}>
+                <Tooltip title="Enter your email address" placement="top">
                   <FormControl fullWidth error={!!errors.email}>
                     <TextField
-                      id="email"
-                      fullWidth
+                      id="email-input"
                       label="Email"
                       type="email"
                       {...form.register('email')}
                       error={!!errors.email}
                       helperText={errors.email?.message}
-                      aria-invalid={!!errors.email}
-                      aria-describedby={errors.email ? 'email-error' : undefined}
-                      InputLabelProps={{
-                        shrink: true,
-                        id: 'email-label'
-                      }}
                       inputProps={{
-                        'aria-label': 'Email address',
-                        'aria-required': 'true',
-                        required: true,
-                        pattern: '[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$',
-                        autoComplete: 'email'
+                        'aria-label': 'Email',
+                        'aria-describedby': errors.email ? 'email-error' : undefined
                       }}
                     />
                   </FormControl>
                 </Tooltip>
               </Grid>
-
+              
               <Grid item xs={12}>
-                <Tooltip title="Enter your 10-digit phone number without spaces or special characters">
+                <Tooltip title="Enter your phone number" placement="top">
                   <FormControl fullWidth error={!!errors.phone}>
                     <TextField
-                      id="phone"
-                      fullWidth
+                      id="phone-input"
                       label="Phone"
-                      type="tel"
                       {...form.register('phone')}
                       error={!!errors.phone}
                       helperText={errors.phone?.message}
-                      aria-invalid={!!errors.phone}
-                      aria-describedby={errors.phone ? 'phone-error' : undefined}
-                      InputLabelProps={{
-                        shrink: true,
-                        id: 'phone-label'
-                      }}
                       inputProps={{
-                        'aria-label': 'Phone number',
-                        'aria-required': 'true',
-                        required: true,
-                        pattern: '[0-9]{10}',
-                        title: 'Phone number must be 10 digits',
-                        autoComplete: 'tel'
+                        'aria-label': 'Phone',
+                        'aria-describedby': errors.phone ? 'phone-error' : undefined
                       }}
                     />
                   </FormControl>
@@ -285,99 +412,81 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
             </Grid>
           </Paper>
         );
-
+        
       case 1:
         return (
           <Paper elevation={0} sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom>Reservation Details</Typography>
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6}>
-                <Tooltip title="Select your preferred date for the reservation">
-                  <FormControl fullWidth error={!!errors.date}>
-                    <DatePicker
-                      id="date"
-                      selected={selectedDate}
-                      onChange={(date) => form.setValue('date', date)}
-                      minDate={new Date()}
-                      placeholderText="Select Date"
-                      className="custom-datepicker"
-                      aria-label="Reservation date"
-                      aria-invalid={!!errors.date}
-                      aria-describedby={errors.date ? 'date-error' : undefined}
-                      aria-required="true"
-                      required
-                      customInput={
-                        <TextField
-                          label="Date"
-                          InputLabelProps={{
-                            shrink: true,
-                          }}
-                        />
-                      }
-                    />
-                  </FormControl>
-                </Tooltip>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={4}>
+                <FormControl fullWidth error={!!errors.date}>
+                  <DatePicker
+                    selected={selectedDate}
+                    onChange={(date) => setValue('date', date)}
+                    minDate={new Date()}
+                    customInput={
+                      <TextField
+                        id="date-input"
+                        fullWidth
+                        label="Date"
+                        error={!!errors.date}
+                        helperText={errors.date?.message}
+                        inputProps={{
+                          'aria-label': 'Date',
+                          'aria-describedby': errors.date ? 'date-error' : undefined
+                        }}
+                      />
+                    }
+                  />
+                </FormControl>
               </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <Tooltip title="Choose your preferred dining time">
-                  <FormControl fullWidth error={!!errors.time}>
-                    <InputLabel id="time-label">Time</InputLabel>
-                    <Select
-                      id="time"
-                      {...form.register('time')}
-                      labelId="time-label"
-                      label="Time"
-                      aria-label="Reservation time"
-                      aria-invalid={!!errors.time}
-                      aria-describedby={errors.time ? 'time-error' : undefined}
-                      aria-required="true"
-                    >
-                      <MenuItem value="" disabled>
-                        <em>Select a time</em>
+              
+              <Grid item xs={12} md={4}>
+                <FormControl fullWidth error={!!errors.time}>
+                  <InputLabel id="time-label">Time</InputLabel>
+                  <Select
+                    labelId="time-label"
+                    id="time-input"
+                    label="Time"
+                    {...form.register('time')}
+                    error={!!errors.time}
+                    inputProps={{
+                      'aria-label': 'Time',
+                      'aria-describedby': errors.time ? 'time-error' : undefined
+                    }}
+                  >
+                    {availableTimes.map((time) => (
+                      <MenuItem key={time} value={time}>
+                        {formatTime(time)}
                       </MenuItem>
-                      {availableTimes.map((time) => (
-                        <MenuItem 
-                          key={time} 
-                          value={time}
-                          role="option"
-                          aria-label={`Reserve table for ${formatTime(time)}`}
-                        >
-                          {formatTime(time)}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Tooltip>
+                    ))}
+                  </Select>
+                  {errors.time && (
+                    <FormHelperText error>{errors.time.message}</FormHelperText>
+                  )}
+                </FormControl>
               </Grid>
-
-              <Grid item xs={12}>
-                <Tooltip title="Specify the number of guests (maximum 10 per table)">
-                  <FormControl fullWidth error={!!errors.guests}>
-                    <TextField
-                      id="guests"
-                      type="number"
-                      label="Number of Guests"
-                      {...form.register('guests', { valueAsNumber: true })}
-                      InputLabelProps={{
-                        shrink: true,
-                        id: 'guests-label'
-                      }}
-                      InputProps={{ 
-                        inputProps: { 
-                          min: 1, 
-                          max: 10,
-                          'aria-label': 'Number of guests',
-                          'aria-required': 'true',
-                        }
-                      }}
-                      error={!!errors.guests}
-                      helperText={errors.guests?.message}
-                      aria-invalid={!!errors.guests}
-                      aria-describedby={errors.guests ? 'guests-error' : undefined}
-                    />
-                  </FormControl>
-                </Tooltip>
+              
+              <Grid item xs={12} md={4}>
+                <FormControl fullWidth error={!!errors.guests}>
+                  <TextField
+                    id="guests-input"
+                    label="Number of guests"
+                    type="number"
+                    {...form.register('guests', {
+                      valueAsNumber: true,
+                      setValueAs: v => Number(v)
+                    })}
+                    error={!!errors.guests}
+                    helperText={errors.guests?.message}
+                    inputProps={{
+                      min: 1,
+                      max: 10,
+                      'aria-label': 'Number of guests',
+                      'aria-describedby': errors.guests ? 'guests-error' : undefined
+                    }}
+                  />
+                </FormControl>
               </Grid>
             </Grid>
           </Paper>
@@ -393,7 +502,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
                   <FormControl fullWidth error={!!errors.occasion}>
                     <InputLabel id="occasion-label">Occasion</InputLabel>
                     <Select
-                      id="occasion"
+                      id="occasion-input"
                       {...form.register('occasion')}
                       labelId="occasion-label"
                       label="Occasion"
@@ -422,14 +531,13 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
                   <FormControl fullWidth error={!!errors.seating}>
                     <InputLabel id="seating-label">Seating Preference</InputLabel>
                     <Select
-                      id="seating"
+                      id="seating-input"
                       {...form.register('seating')}
                       labelId="seating-label"
                       label="Seating Preference"
                       aria-label="Select seating preference"
                       aria-invalid={!!errors.seating}
                       aria-describedby={errors.seating ? 'seating-error' : undefined}
-                      aria-required="true"
                     >
                       {seatingOptions.map((option) => (
                         <MenuItem 
@@ -450,7 +558,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
                 <Tooltip title="Add any special requests or dietary requirements">
                   <FormControl fullWidth error={!!errors.specialRequests}>
                     <TextField
-                      id="specialRequests"
+                      id="special-requests-input"
                       fullWidth
                       label="Special Requests"
                       placeholder="E.g., dietary restrictions, accessibility needs, or special occasions"
@@ -459,12 +567,9 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
                       {...form.register('specialRequests')}
                       error={!!errors.specialRequests}
                       helperText={errors.specialRequests?.message}
-                      aria-label="Special requests"
-                      aria-invalid={!!errors.specialRequests}
-                      aria-describedby={errors.specialRequests ? 'special-requests-error' : undefined}
-                      InputLabelProps={{
-                        shrink: true,
-                        id: 'special-requests-label'
+                      inputProps={{
+                        'aria-label': 'Special requests',
+                        'aria-describedby': errors.specialRequests ? 'special-requests-error' : undefined
                       }}
                     />
                   </FormControl>
@@ -479,108 +584,135 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
   }, [form, errors, availableTimes, selectedDate]);
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} aria-label="Reservation form">
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <Typography variant="h4" component="h1" gutterBottom align="center">
+    <Box sx={{ width: '100%', mb: 4 }}>
+      <Paper elevation={3} sx={{ p: { xs: 2, md: 3 } }}>
+        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 0 }}>
             {isEditing ? 'Edit Booking' : 'Make a Reservation'}
           </Typography>
-        </Grid>
-
-        <Grid item xs={12}>
-          <Stepper activeStep={activeStep} alternativeLabel>
-            <Step>
-              <StepLabel>Contact Info</StepLabel>
-            </Step>
-            <Step>
-              <StepLabel>Reservation Details</StepLabel>
-            </Step>
-            <Step>
-              <StepLabel>Preferences</StepLabel>
-            </Step>
-          </Stepper>
-        </Grid>
-
-        <Grid item xs={12}>
-          {renderStepContent(activeStep)}
-        </Grid>
-
-        <Grid item xs={12}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-            <Button
-              onClick={handleBack}
-              disabled={activeStep === 0}
-              variant="outlined"
-            >
-              Back
-            </Button>
-            <Box>
-              {onCancel && (
-                <Button 
-                  onClick={onCancel} 
-                  variant="outlined"
-                  aria-label="Cancel reservation"
-                  sx={{ mr: 1 }}
+          <Box>
+            <Tooltip title="Undo (Ctrl+Z)">
+              <span>
+                <IconButton 
+                  onClick={handleUndo} 
+                  disabled={isUndoDisabled}
+                  size="small"
                 >
-                  Cancel
-                </Button>
-              )}
-              {activeStep === 2 ? (
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  disabled={!isStepValid(2) || isSubmitting}
+                  <UndoIcon />
+                </IconButton>
+              </span>
+            </Tooltip>
+            <Tooltip title="Redo (Ctrl+Shift+Z)">
+              <span>
+                <IconButton 
+                  onClick={handleRedo} 
+                  disabled={isRedoDisabled}
+                  size="small"
                 >
-                  {isSubmitting ? 'Submitting...' : isEditing ? 'Update Booking' : 'Reserve Table'}
-                </Button>
-              ) : (
-                <Button
-                  variant="contained"
-                  onClick={handleNext}
-                  disabled={!isStepValid(activeStep)}
-                >
-                  Next
-                </Button>
-              )}
-            </Box>
+                  <RedoIcon />
+                </IconButton>
+              </span>
+            </Tooltip>
           </Box>
-        </Grid>
-      </Grid>
+        </Box>
 
-      <Dialog
-        open={showConfirmation}
-        onClose={() => setShowConfirmation(false)}
-        aria-labelledby="confirmation-dialog-title"
-      >
-        <DialogTitle id="confirmation-dialog-title">
-          Confirm Reservation
-        </DialogTitle>
-        <DialogContent>
-          {formData && (
-            <Box>
-              <Typography variant="body1" paragraph>
-                Please confirm your reservation details:
-              </Typography>
-              <Typography><strong>Name:</strong> {formData.name}</Typography>
-              <Typography><strong>Date:</strong> {format(formData.date, 'MMMM d, yyyy')}</Typography>
-              <Typography><strong>Time:</strong> {formatTime(formData.time)}</Typography>
-              <Typography><strong>Guests:</strong> {formData.guests}</Typography>
-              <Typography><strong>Occasion:</strong> {formData.occasion}</Typography>
-              <Typography><strong>Seating:</strong> {formData.seating}</Typography>
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowConfirmation(false)}>
-            Edit
-          </Button>
-          <Button onClick={handleConfirmSubmit} variant="contained" color="primary">
-            Confirm Reservation
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </form>
+        <form onSubmit={handleSubmit(handleFormSubmit)} aria-label="Reservation form">
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <Stepper activeStep={activeStep} alternativeLabel>
+                <Step>
+                  <StepLabel>Contact Info</StepLabel>
+                </Step>
+                <Step>
+                  <StepLabel>Reservation Details</StepLabel>
+                </Step>
+                <Step>
+                  <StepLabel>Preferences</StepLabel>
+                </Step>
+              </Stepper>
+            </Grid>
+
+            <Grid item xs={12}>
+              {renderStepContent(activeStep)}
+            </Grid>
+
+            <Grid item xs={12}>
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+                <Box>
+                  {activeStep > 0 && (
+                    <Button onClick={handleBack} sx={{ mr: 1 }}>
+                      Back
+                    </Button>
+                  )}
+                  {onCancel && (
+                    <Button
+                      onClick={onCancel}
+                      variant="outlined"
+                      aria-label="Cancel reservation"
+                      sx={{ mr: 1 }}
+                    >
+                      Cancel
+                    </Button>
+                  )}
+                  {activeStep === 2 ? (
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      color="primary"
+                      disabled={!isStepValid(2) || isSubmitting}
+                    >
+                      {isSubmitting ? 'Submitting...' : isEditing ? 'Update Booking' : 'Reserve Table'}
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      onClick={handleNext}
+                      disabled={!isStepValid(activeStep)}
+                    >
+                      Next
+                    </Button>
+                  )}
+                </Box>
+              </Box>
+            </Grid>
+          </Grid>
+
+          <Dialog
+            open={showConfirmation}
+            onClose={() => setShowConfirmation(false)}
+            aria-labelledby="confirmation-dialog-title"
+          >
+            <DialogTitle id="confirmation-dialog-title">
+              Confirm Reservation
+            </DialogTitle>
+            <DialogContent>
+              {formData && (
+                <Box>
+                  <Typography variant="body1" paragraph>
+                    Please confirm your reservation details:
+                  </Typography>
+                  <Typography><strong>Name:</strong> {formData.name}</Typography>
+                  <Typography><strong>Date:</strong> {format(formData.date, 'MMMM d, yyyy')}</Typography>
+                  <Typography><strong>Time:</strong> {formatTime(formData.time)}</Typography>
+                  <Typography><strong>Guests:</strong> {formData.guests}</Typography>
+                  <Typography><strong>Occasion:</strong> {formData.occasion}</Typography>
+                  <Typography><strong>Seating:</strong> {formData.seating}</Typography>
+                  <Typography><strong>Special Requests:</strong> {formData.specialRequests}</Typography>
+                </Box>
+              )}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setShowConfirmation(false)}>
+                Edit
+              </Button>
+              <Button onClick={handleConfirmSubmit} variant="contained" color="primary">
+                Confirm Reservation
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </form>
+      </Paper>
+    </Box>
   );
 };
 
