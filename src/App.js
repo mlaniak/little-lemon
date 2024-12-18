@@ -1,5 +1,5 @@
 import React from 'react';
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route, BrowserRouter } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -9,15 +9,17 @@ import Reservations from './pages/Reservations';
 import About from './pages/About';
 import Order from './pages/Order';
 import Login from './pages/Login';
+import ConfirmedBooking from './pages/ConfirmedBooking';
+import { BookingsProvider } from './providers/BookingsProvider';
 import './App.css';
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#495E57', // Little Lemon primary green
+      main: '#495E57',
     },
     secondary: {
-      main: '#F4CE14', // Little Lemon yellow
+      main: '#F4CE14',
     },
   },
   typography: {
@@ -33,26 +35,27 @@ const theme = createTheme({
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <Router>
-        <>
-          <header>
+    <BrowserRouter basename="/little-lemon">
+      <BookingsProvider>
+        <ThemeProvider theme={theme}>
+          <div className="app">
             <Navbar />
-          </header>
-          <main>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/menu" element={<Menu />} />
-              <Route path="/reservations" element={<Reservations />} />
-              <Route path="/order" element={<Order />} />
-              <Route path="/login" element={<Login />} />
-            </Routes>
-          </main>
-          <Footer />
-        </>
-      </Router>
-    </ThemeProvider>
+            <main>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/menu" element={<Menu />} />
+                <Route path="/reservations" element={<Reservations />} />
+                <Route path="/booking-confirmed" element={<ConfirmedBooking />} />
+                <Route path="/order" element={<Order />} />
+                <Route path="/login" element={<Login />} />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
+        </ThemeProvider>
+      </BookingsProvider>
+    </BrowserRouter>
   );
 }
 
