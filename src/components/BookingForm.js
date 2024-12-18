@@ -66,16 +66,13 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
     mode: 'onBlur'
   });
 
-  const { handleSubmit, formState: { isValid } } = form;
-
+  const { handleSubmit } = form;
   const selectedDate = form.watch('date');
 
   React.useEffect(() => {
     let isMounted = true;
 
     const fetchTimes = async () => {
-      if (!selectedDate) return;
-      
       setIsLoading(true);
       try {
         const times = await getAvailableTimeSlots(selectedDate);
@@ -85,22 +82,21 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
         }
       } catch (error) {
         console.error('Error fetching times:', error);
-        if (isMounted) {
-          setAvailableTimes([]);
-        }
       } finally {
         if (isMounted) {
           setIsLoading(false);
         }
       }
     };
-    
-    fetchTimes();
+
+    if (selectedDate) {
+      fetchTimes();
+    }
 
     return () => {
       isMounted = false;
     };
-  }, [selectedDate, getAvailableTimeSlots, form.setValue]);
+  }, [selectedDate, getAvailableTimeSlots, form]);
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
