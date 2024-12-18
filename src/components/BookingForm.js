@@ -555,7 +555,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
       default:
         return null;
     }
-  }, [errors, form, availableTimes, formatTime, setValue]);
+  }, [errors, form, availableTimes, formatTime, setValue, selectedDate]);
 
   return (
     <Box sx={{ width: '100%', mb: 4 }}>
