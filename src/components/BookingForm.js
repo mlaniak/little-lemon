@@ -1,4 +1,4 @@
-import React, { useContext, useState, useCallback } from 'react';
+import React, { useContext, useState, useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -24,8 +24,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Paper,
-  Divider
+  Paper
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -68,7 +67,6 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
   const navigate = useNavigate();
   const { getAvailableTimeSlots, addBooking } = useContext(BookingsContext);
   const [availableTimes, setAvailableTimes] = React.useState([]);
-  const [isLoading, setIsLoading] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -93,19 +91,19 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
     reValidateMode: 'onBlur'
   });
 
-  const { handleSubmit, watch, formState: { errors, dirtyFields }, getValues, trigger } = form;
+  const { handleSubmit, watch, formState: { errors }, getValues } = form;
   const selectedDate = watch('date');
 
-  // Define fields object at component scope
-  const fields = {
+  // Define fields object with useMemo to prevent recreation on every render
+  const fields = useMemo(() => ({
     0: ['name', 'email', 'phone'],
     1: ['date', 'time', 'guests'],
     2: ['occasion', 'seating']
-  };
+  }), []);
 
   // Format time to 12-hour format
   const formatTime = (time) => {
-    // Check if time already includes AM/PM
+    if (!time) return '';
     if (time.includes('AM') || time.includes('PM')) {
       return time;
     }
@@ -121,33 +119,17 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
     const currentFields = fields[step] || [];
     const values = getValues();
     
-    // Debug values
-    console.log('Step:', step);
-    console.log('Current fields:', currentFields);
-    console.log('Form values:', values);
-    console.log('Dirty fields:', dirtyFields);
-    console.log('Errors:', errors);
-    
-    const stepIsValid = currentFields.every(field => {
+    return currentFields.every(field => {
       const value = values[field];
-      const hasValue = value && value.toString().trim() !== '';
-      console.log(`Field ${field}:`, { value, hasValue });
-      return hasValue;
+      return value && value.toString().trim() !== '';
     });
+  }, [getValues, fields]);
 
-    console.log('Step is valid:', stepIsValid);
-    return stepIsValid;
-  }, [getValues, dirtyFields, errors]);
-
-  const handleNext = useCallback(async () => {
-    const currentFields = fields[activeStep];
-    const stepValid = isStepValid(activeStep);
-    console.log('Attempting next step. Valid:', stepValid);
-    
-    if (stepValid) {
+  const handleNext = useCallback(() => {
+    if (isStepValid(activeStep)) {
       setActiveStep((prev) => Math.min(prev + 1, 2));
     }
-  }, [activeStep, isStepValid, fields]);
+  }, [activeStep, isStepValid]);
 
   const handleBack = useCallback(() => {
     setActiveStep((prev) => Math.max(prev - 1, 0));
@@ -181,7 +163,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
     let isMounted = true;
 
     const fetchTimes = async () => {
-      setIsLoading(true);
+      setIsSubmitting(true);
       try {
         const times = await getAvailableTimeSlots(selectedDate);
         if (isMounted) {
@@ -192,7 +174,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
         console.error('Error fetching times:', error);
       } finally {
         if (isMounted) {
-          setIsLoading(false);
+          setIsSubmitting(false);
         }
       }
     };
@@ -491,11 +473,13 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
             </Grid>
           </Paper>
         );
+      default:
+        return null;
     }
-  }, [form, errors, availableTimes]);
+  }, [form, errors, availableTimes, selectedDate]);
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} aria-label="Reservation form" role="form" noValidate>
+    <form onSubmit={handleSubmit(handleFormSubmit)} aria-label="Reservation form">
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Typography variant="h4" component="h1" gutterBottom align="center">
