@@ -7,6 +7,12 @@ Hey there! I'm Michael Laniak, and I created this as part of Meta's Coursera Fro
 Little Lemon needed an online booking feature, so I rolled up my sleeves and built one! This project is the culmination of everything I learned in the course, from user research to high-fidelity prototypes. While the entire restaurant website is included, the booking system is the star of the show - designed with mobile users in mind and showcasing a seamless reservation experience.
 
 > **Note**: The **Reserve a Table** function is the primary focus, demonstrating my skills in React development and UX design principles.
+>
+> <img width="1266" alt="image" src="https://github.com/user-attachments/assets/1cfec245-d7a9-4197-975b-ef8fbfee609a" />
+
+<img width="1255" alt="image" src="https://github.com/user-attachments/assets/f804b456-2d19-449f-96a6-2fcc7563e287" />
+
+
 
 ## ✨ Key Features
 
