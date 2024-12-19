@@ -20,28 +20,8 @@
 - Submit pull requests for review
 - Keep commits atomic and focused
 
-## AI Development Guidelines
-### Prompt Engineering
-- Be specific about the component or feature you're working on
-- Provide context about the project's existing patterns
-- Specify any performance requirements
-- Mention accessibility requirements if applicable
-
-### AI Tool Usage
-- Use AI for:
-  - Code review suggestions
-  - Documentation generation
-  - Testing scenarios
-  - Performance optimization ideas
-  - Accessibility improvements
-- Always review AI-generated code for:
-  - Security concerns
-  - Performance implications
-  - Accessibility compliance
-  - Integration with existing patterns
-
 ### Code Quality Checks
-Before submitting AI-generated code:
+Before submitting code:
 1. Ensure it follows project structure
 2. Verify all imports are correct
 3. Check for proper error handling
