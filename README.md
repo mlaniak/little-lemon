@@ -1,70 +1,70 @@
-# Getting Started with Create React App
+# 🍋 Little Lemon Restaurant
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Hey there! 👋 I'm Michael Laniak, and this is my implementation of the Little Lemon Restaurant website. I built this as part of my Meta Front-End Developer Capstone project, and I'm excited to share it with you!
 
-## Available Scripts
+## 🌟 What's This All About?
 
-In the project directory, you can run:
+This is a modern, responsive web application where customers can easily book a table at the Little Lemon restaurant. I've put a lot of effort into making it user-friendly and accessible for everyone.
 
-### `npm start`
+## ✨ Cool Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Smart Booking System**: Pick your preferred time and date with our dynamic reservation system
+- **Works Everywhere**: Looks great on your phone, tablet, or desktop
+- **Accessibility First**: Built with everyone in mind, following WCAG guidelines
+- **Clean Code**: Organized components that make future updates a breeze
+- **API Ready**: Set up to handle real-world data interactions
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🛠️ Tech Stack
 
-### `npm test`
+Here's what I used to build this:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- **React**: For creating all the interactive bits
+- **React Router**: Smooth navigation between pages
+- **Formik & Yup**: Making forms work like a charm
+- **React Testing Library**: Making sure everything works as it should
+- **ChakraUI**: For that sleek, modern look
+- **FontAwesome**: Those nice little icons you see around
 
-### `npm run build`
+## 🚀 Getting Started
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Prerequisites
+- Node.js (v16 or higher)
+- npm (v7 or higher)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Setup Steps
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. Clone the repo:
+```bash
+git clone [your-repo-url]
+cd little-lemon
+```
 
-### `npm run eject`
+2. Install what you need:
+```bash
+npm install
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+3. Fire it up:
+```bash
+npm start
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 🧪 Testing
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+I've included comprehensive tests to make sure everything works perfectly. Here's how to run them:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+npm test
+```
 
-## Learn More
+Want to see the test coverage?
+```bash
+npm run coverage
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 🤝 Let's Connect!
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Found a bug? Have a suggestion? Feel free to open an issue or reach out to me directly!
 
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---
+Built with 💚 by Michael Laniak
