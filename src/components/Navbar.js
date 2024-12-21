@@ -125,7 +125,7 @@ const Navbar = () => {
                   to={item.path}
                   sx={{ 
                     color: 'text.primary',
-                    fontSize: '16pt',
+                    fontSize: '1rem',
                     fontFamily: 'Karla, sans-serif',
                     fontWeight: 500,
                     textTransform: 'uppercase',
@@ -145,7 +145,7 @@ const Navbar = () => {
                 to="/login"
                 sx={{ 
                   color: 'text.primary',
-                  fontSize: '16pt',
+                  fontSize: '1rem',
                   fontFamily: 'Karla, sans-serif',
                   fontWeight: 500,
                   textTransform: 'uppercase',
