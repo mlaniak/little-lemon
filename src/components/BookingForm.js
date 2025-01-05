@@ -33,6 +33,17 @@ import RedoIcon from '@mui/icons-material/Redo';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 
+// Helper function to format dates with the day of the week
+const formatDateWithDay = (date) => {
+  if (!date) return '';
+  return date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  });
+};
+
 // Form validation schema
 const bookingSchema = z.object({
   name: z.string()
@@ -43,19 +54,32 @@ const bookingSchema = z.object({
   phone: z.string()
     .regex(/^[0-9]{10}$/, 'Phone number must be 10 digits'),
   date: z.date()
-    .refine(date => date >= new Date(new Date().setHours(0, 0, 0, 0)), 'Date cannot be in the past'),
+    .refine(date => {
+      const now = new Date('2025-01-05T00:38:35-06:00');
+      return date >= new Date(now.setHours(0, 0, 0, 0));
+    }, 'Date cannot be in the past'),
   time: z.string()
     .min(1, 'Please select a time'),
   guests: z.number()
     .min(1, 'At least 1 guest is required')
     .max(10, 'Maximum 10 guests allowed'),
   occasion: z.string()
-    .min(1, 'Please select an occasion'),
+    .optional(),
   seating: z.string()
-    .min(1, 'Please select a seating preference'),
+    .optional(),
   specialRequests: z.string()
     .max(500, 'Special requests must be less than 500 characters')
     .optional(),
+}).refine((data) => {
+  if (!data.time || !data.date) return true;
+  const now = new Date('2025-01-05T00:38:35-06:00');
+  const [hours, minutes] = data.time.split(':');
+  const selectedDateTime = new Date(data.date);
+  selectedDateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+  return selectedDateTime > now;
+}, {
+  message: "Selected time has already passed",
+  path: ["time"]
 });
 
 const occasions = [
@@ -85,7 +109,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
     name: '',
     email: '',
     phone: '',
-    date: null,
+    date: new Date(),
     time: '',
     guests: 2,
     occasion: '',
@@ -265,8 +289,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
     
     // For step 3 (preferences)
     if (step === 2) {
-      const { occasion, seating } = values;
-      return Boolean(occasion) && Boolean(seating);
+      return true; // Preferences are optional
     }
     
     return false;
@@ -306,6 +329,22 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
     }
   };
 
+  const filterPastTimes = useCallback((times, selectedDate) => {
+    const now = new Date('2025-01-05T00:37:12-06:00'); // Using the provided current time
+    
+    // If selected date is today, filter out past times
+    if (selectedDate && selectedDate.toDateString() === now.toDateString()) {
+      return times.filter(time => {
+        const [hours, minutes] = time.split(':');
+        const timeToCheck = new Date(selectedDate);
+        timeToCheck.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+        return timeToCheck > now;
+      });
+    }
+    
+    return times;
+  }, []);
+
   React.useEffect(() => {
     let isMounted = true;
 
@@ -314,8 +353,12 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
       try {
         const times = await getAvailableTimeSlots(selectedDate);
         if (isMounted) {
-          setAvailableTimes(times || []);
-          setValue('time', '');
+          const filteredTimes = filterPastTimes(times || [], selectedDate);
+          setAvailableTimes(filteredTimes);
+          // Set the first available time if no time is selected
+          if (filteredTimes && filteredTimes.length > 0 && !watch('time')) {
+            setValue('time', filteredTimes[0]);
+          }
         }
       } catch (error) {
         console.error('Error fetching times:', error);
@@ -333,7 +376,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
     return () => {
       isMounted = false;
     };
-  }, [selectedDate, getAvailableTimeSlots, setValue]);
+  }, [selectedDate, getAvailableTimeSlots, setValue, watch, filterPastTimes]);
 
   const renderStepContent = useCallback((step) => {
     switch (step) {
@@ -411,6 +454,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
                     selected={selectedDate}
                     onChange={(date) => setValue('date', date)}
                     minDate={new Date()}
+                    dateFormat="EEEE, MM/dd/yyyy"
                     customInput={
                       <TextField
                         id="date-input"
@@ -435,6 +479,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
                     labelId="time-label"
                     id="time-input"
                     label="Time"
+                    value={watch('time') || ''}
                     {...form.register('time')}
                     error={!!errors.time}
                     inputProps={{
@@ -483,6 +528,9 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
         return (
           <Paper elevation={0} sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom>Preferences</Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              All fields in this section are optional. Feel free to skip if you don't have any specific preferences.
+            </Typography>
             <Grid container spacing={3}>
               <Grid item xs={12} sm={6}>
                 <Tooltip title="Select the occasion you're celebrating (if any)">
@@ -590,7 +638,14 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
           </Box>
         </Box>
 
-        <form onSubmit={handleSubmit(handleFormSubmit)} aria-label="Reservation form">
+        <form onSubmit={(e) => {
+          // Only submit if we're on the last step
+          if (activeStep !== 2) {
+            e.preventDefault();
+            return;
+          }
+          handleSubmit(handleFormSubmit)(e);
+        }} aria-label="Reservation form">
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <Stepper activeStep={activeStep} alternativeLabel>
@@ -601,7 +656,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
                   <StepLabel>Reservation Details</StepLabel>
                 </Step>
                 <Step>
-                  <StepLabel>Preferences</StepLabel>
+                  <StepLabel>Preferences (Optional)</StepLabel>
                 </Step>
               </Stepper>
             </Grid>
@@ -611,13 +666,15 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
             </Grid>
 
             <Grid item xs={12}>
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
                 <Box>
                   {activeStep > 0 && (
                     <Button onClick={handleBack} sx={{ mr: 1 }}>
                       Back
                     </Button>
                   )}
+                </Box>
+                <Box>
                   {onCancel && (
                     <Button
                       onClick={onCancel}
@@ -638,53 +695,59 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
                       {isSubmitting ? 'Submitting...' : isEditing ? 'Update Booking' : 'Reserve Table'}
                     </Button>
                   ) : (
-                    <Button
-                      variant="contained"
-                      onClick={handleNext}
-                      disabled={!isStepValid(activeStep)}
-                    >
-                      Next
-                    </Button>
+                    <div onClick={(e) => e.preventDefault()}>
+                      <Button
+                        type="button"
+                        variant="contained"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleNext();
+                        }}
+                        disabled={!isStepValid(activeStep)}
+                      >
+                        Next
+                      </Button>
+                    </div>
                   )}
                 </Box>
               </Box>
             </Grid>
           </Grid>
-
-          <Dialog
-            open={showConfirmation}
-            onClose={() => setShowConfirmation(false)}
-            aria-labelledby="confirmation-dialog-title"
-          >
-            <DialogTitle id="confirmation-dialog-title">
-              Confirm Reservation
-            </DialogTitle>
-            <DialogContent>
-              {formData && (
-                <Box>
-                  <Typography variant="body1" paragraph>
-                    Please confirm your reservation details:
-                  </Typography>
-                  <Typography><strong>Name:</strong> {formData.name}</Typography>
-                  <Typography><strong>Date:</strong> {format(formData.date, 'MMMM d, yyyy')}</Typography>
-                  <Typography><strong>Time:</strong> {formatTime(formData.time)}</Typography>
-                  <Typography><strong>Guests:</strong> {formData.guests}</Typography>
-                  <Typography><strong>Occasion:</strong> {formData.occasion}</Typography>
-                  <Typography><strong>Seating:</strong> {formData.seating}</Typography>
-                  <Typography><strong>Special Requests:</strong> {formData.specialRequests}</Typography>
-                </Box>
-              )}
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setShowConfirmation(false)}>
-                Edit
-              </Button>
-              <Button onClick={handleConfirmSubmit} variant="contained" color="primary">
-                Confirm Reservation
-              </Button>
-            </DialogActions>
-          </Dialog>
         </form>
+
+        <Dialog
+          open={showConfirmation}
+          onClose={() => setShowConfirmation(false)}
+          aria-labelledby="confirmation-dialog-title"
+        >
+          <DialogTitle id="confirmation-dialog-title">
+            Confirm Reservation
+          </DialogTitle>
+          <DialogContent>
+            {formData && (
+              <Box>
+                <Typography variant="body1" paragraph>
+                  Please confirm your reservation details:
+                </Typography>
+                <Typography><strong>Name:</strong> {formData.name}</Typography>
+                <Typography><strong>Date:</strong> {formatDateWithDay(formData.date)}</Typography>
+                <Typography><strong>Time:</strong> {formatTime(formData.time)}</Typography>
+                <Typography><strong>Guests:</strong> {formData.guests}</Typography>
+                <Typography><strong>Occasion:</strong> {formData.occasion}</Typography>
+                <Typography><strong>Seating:</strong> {formData.seating}</Typography>
+                <Typography><strong>Special Requests:</strong> {formData.specialRequests}</Typography>
+              </Box>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setShowConfirmation(false)}>
+              Edit
+            </Button>
+            <Button onClick={handleConfirmSubmit} variant="contained" color="primary">
+              Confirm Reservation
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Paper>
     </Box>
   );
