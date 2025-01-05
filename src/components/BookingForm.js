@@ -13,6 +13,7 @@ import {
   FormControl,
   FormHelperText,
   Grid,
+  IconButton,
   InputLabel,
   MenuItem,
   Paper,
@@ -23,14 +24,11 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import UndoIcon from '@mui/icons-material/Undo';
+import RedoIcon from '@mui/icons-material/Redo';
 import { DatePicker } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../pages/DatePicker.css';
-import {
-  UndoIcon,
-  RedoIcon,
-  IconButton
-} from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
 // Helper function to format dates with the day of the week
@@ -522,69 +520,63 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
             </Typography>
             <Grid container spacing={3}>
               <Grid item xs={12} sm={6}>
-                <Tooltip title="Select the occasion you're celebrating (if any)">
-                  <FormControl fullWidth error={!!errors.occasion}>
-                    <InputLabel id="occasion-label">Occasion</InputLabel>
-                    <Select
-                      id="occasion-input"
-                      {...form.register('occasion')}
-                      labelId="occasion-label"
-                      label="Occasion"
-                      aria-label="Select occasion"
-                      aria-invalid={!!errors.occasion}
-                      aria-describedby={errors.occasion ? 'occasion-error' : undefined}
-                    >
-                      {occasions.map((option) => (
-                        <MenuItem key={option} value={option}>
-                          {option}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Tooltip>
+                <FormControl fullWidth error={!!errors.occasion}>
+                  <InputLabel id="occasion-label">Occasion</InputLabel>
+                  <Select
+                    id="occasion-input"
+                    {...form.register('occasion')}
+                    labelId="occasion-label"
+                    label="Occasion"
+                    aria-label="Select occasion"
+                    aria-invalid={!!errors.occasion}
+                    aria-describedby={errors.occasion ? 'occasion-error' : undefined}
+                  >
+                    {occasions.map((option) => (
+                      <MenuItem key={option} value={option}>
+                        {option}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </Grid>
               
               <Grid item xs={12} sm={6}>
-                <Tooltip title="Choose your preferred seating area">
-                  <FormControl fullWidth error={!!errors.seating}>
-                    <InputLabel id="seating-label">Seating Preference</InputLabel>
-                    <Select
-                      id="seating-input"
-                      {...form.register('seating')}
-                      labelId="seating-label"
-                      label="Seating Preference"
-                      aria-label="Select seating preference"
-                      aria-invalid={!!errors.seating}
-                      aria-describedby={errors.seating ? 'seating-error' : undefined}
-                    >
-                      {seatingOptions.map((option) => (
-                        <MenuItem key={option} value={option}>
-                          {option}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Tooltip>
+                <FormControl fullWidth error={!!errors.seating}>
+                  <InputLabel id="seating-label">Seating Preference</InputLabel>
+                  <Select
+                    id="seating-input"
+                    {...form.register('seating')}
+                    labelId="seating-label"
+                    label="Seating Preference"
+                    aria-label="Select seating preference"
+                    aria-invalid={!!errors.seating}
+                    aria-describedby={errors.seating ? 'seating-error' : undefined}
+                  >
+                    {seatingOptions.map((option) => (
+                      <MenuItem key={option} value={option}>
+                        {option}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </Grid>
               
               <Grid item xs={12}>
-                <Tooltip title="Add any special requests or notes for your reservation">
-                  <FormControl fullWidth error={!!errors.specialRequests}>
-                    <TextField
-                      id="special-requests-input"
-                      label="Special Requests"
-                      multiline
-                      rows={4}
-                      {...form.register('specialRequests')}
-                      error={!!errors.specialRequests}
-                      helperText={errors.specialRequests?.message}
-                      inputProps={{
-                        'aria-label': 'Special requests',
-                        'aria-describedby': errors.specialRequests ? 'special-requests-error' : undefined
-                      }}
-                    />
-                  </FormControl>
-                </Tooltip>
+                <FormControl fullWidth error={!!errors.specialRequests}>
+                  <TextField
+                    id="special-requests-input"
+                    label="Special Requests"
+                    multiline
+                    rows={4}
+                    {...form.register('specialRequests')}
+                    error={!!errors.specialRequests}
+                    helperText={errors.specialRequests?.message}
+                    inputProps={{
+                      'aria-label': 'Special requests',
+                      'aria-describedby': errors.specialRequests ? 'special-requests-error' : undefined
+                    }}
+                  />
+                </FormControl>
               </Grid>
             </Grid>
           </Paper>
