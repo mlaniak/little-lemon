@@ -1,37 +1,37 @@
-import React, { useContext, useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useContext, useState, useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { BookingsContext } from '../contexts/BookingsContext';
-import DatePicker from 'react-datepicker';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  FormHelperText,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  Step,
+  StepLabel,
+  Stepper,
+  TextField,
+  Typography,
+} from '@mui/material';
+import { DatePicker } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../pages/DatePicker.css';
 import {
-  Grid,
-  TextField,
-  Button,
-  FormControl,
-  FormHelperText,
-  InputLabel,
-  Select,
-  MenuItem,
-  Typography,
-  Box,
-  Stepper,
-  Step,
-  StepLabel,
-  Tooltip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Paper,
+  UndoIcon,
+  RedoIcon,
   IconButton
-} from '@mui/material';
-import UndoIcon from '@mui/icons-material/Undo';
-import RedoIcon from '@mui/icons-material/Redo';
+} from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
 
 // Helper function to format dates with the day of the week
 const formatDateWithDay = (date) => {
@@ -386,58 +386,47 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
             <Typography variant="h6" gutterBottom>Contact Information</Typography>
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                <Tooltip title="Enter your full name" placement="top">
-                  <FormControl fullWidth error={!!errors.name}>
-                    <TextField
-                      id="name-input"
-                      label="Name"
-                      {...form.register('name')}
-                      error={!!errors.name}
-                      helperText={errors.name?.message}
-                      inputProps={{
-                        'aria-label': 'Name',
-                        'aria-describedby': errors.name ? 'name-error' : undefined
-                      }}
-                    />
-                  </FormControl>
-                </Tooltip>
+                <TextField
+                  id="name-input"
+                  label="Full Name"
+                  fullWidth
+                  {...form.register('name')}
+                  error={!!errors.name}
+                  helperText={errors.name?.message}
+                  inputProps={{
+                    'aria-label': 'Full Name',
+                    'aria-describedby': errors.name ? 'name-error' : undefined
+                  }}
+                />
               </Grid>
-              
               <Grid item xs={12}>
-                <Tooltip title="Enter your email address" placement="top">
-                  <FormControl fullWidth error={!!errors.email}>
-                    <TextField
-                      id="email-input"
-                      label="Email"
-                      type="email"
-                      {...form.register('email')}
-                      error={!!errors.email}
-                      helperText={errors.email?.message}
-                      inputProps={{
-                        'aria-label': 'Email',
-                        'aria-describedby': errors.email ? 'email-error' : undefined
-                      }}
-                    />
-                  </FormControl>
-                </Tooltip>
+                <TextField
+                  id="email-input"
+                  label="Email"
+                  fullWidth
+                  type="email"
+                  {...form.register('email')}
+                  error={!!errors.email}
+                  helperText={errors.email?.message}
+                  inputProps={{
+                    'aria-label': 'Email',
+                    'aria-describedby': errors.email ? 'email-error' : undefined
+                  }}
+                />
               </Grid>
-              
               <Grid item xs={12}>
-                <Tooltip title="Enter your phone number" placement="top">
-                  <FormControl fullWidth error={!!errors.phone}>
-                    <TextField
-                      id="phone-input"
-                      label="Phone"
-                      {...form.register('phone')}
-                      error={!!errors.phone}
-                      helperText={errors.phone?.message}
-                      inputProps={{
-                        'aria-label': 'Phone',
-                        'aria-describedby': errors.phone ? 'phone-error' : undefined
-                      }}
-                    />
-                  </FormControl>
-                </Tooltip>
+                <TextField
+                  id="phone-input"
+                  label="Phone Number"
+                  fullWidth
+                  {...form.register('phone')}
+                  error={!!errors.phone}
+                  helperText={errors.phone?.message || 'Format: 1234567890'}
+                  inputProps={{
+                    'aria-label': 'Phone Number',
+                    'aria-describedby': errors.phone ? 'phone-error' : undefined
+                  }}
+                />
               </Grid>
             </Grid>
           </Paper>
@@ -603,7 +592,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
       default:
         return null;
     }
-  }, [errors, form, availableTimes, formatTime, setValue, selectedDate]);
+  }, [errors, form, availableTimes, formatTime, setValue, selectedDate, watch]);
 
   return (
     <Box sx={{ width: '100%', mb: 4 }}>
