@@ -27,7 +27,7 @@ import {
 } from '@mui/material';
 import UndoIcon from '@mui/icons-material/Undo';
 import RedoIcon from '@mui/icons-material/Redo';
-import { DatePicker } from 'react-datepicker';
+import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../pages/DatePicker.css';
 import { useNavigate } from 'react-router-dom';
@@ -439,7 +439,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
               <Grid item xs={12} md={4}>
                 <FormControl fullWidth error={!!errors.date}>
                   <DatePicker
-                    selected={selectedDate}
+                    selected={watch('date')}
                     onChange={(date) => setValue('date', date)}
                     minDate={new Date()}
                     dateFormat="EEEE, MM/dd/yyyy"
@@ -450,6 +450,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
                         label="Date"
                         error={!!errors.date}
                         helperText={errors.date?.message}
+                        value={watch('date') ? formatDateWithDay(watch('date')) : ''}
                         inputProps={{
                           'aria-label': 'Date',
                           'aria-describedby': errors.date ? 'date-error' : undefined
@@ -585,7 +586,7 @@ const BookingForm = ({ onSubmitSuccess, initialValues, onCancel, isEditing }) =>
       default:
         return null;
     }
-  }, [errors, form, availableTimes, formatTime, setValue, selectedDate, watch]);
+  }, [errors, form, availableTimes, formatTime, setValue, watch]);
 
   return (
     <Box sx={{ width: '100%', mb: 4 }}>
